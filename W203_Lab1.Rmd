@@ -107,6 +107,28 @@ rel_data <- read.csv('datasets/GSS_religion.csv')
 
 Data source: 2020 American National Election Studies (ANES) - 2020 Time Series Study 
 
+Research question: Did Democratic voters or Republican voters experience more difficulty voting in the 2020 election?
+
+Define the following:
+1. Democratic voters
+2. Republican voters
+3. DFactors contributing to difficulty in voting --> create an index?
+
+Data cleaning and wrangling 
+
+Form final dataset 
+
+EDA and basic information on the variables and proof we can make assumptions needed for tests we will run
+
+Run tests
+
+Interpret tests
+
+Create visualizations (if not done before)
+
+Write report
+
+
 ```{r}
 anes_data <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
 ```
