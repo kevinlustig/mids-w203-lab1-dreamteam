@@ -9,6 +9,17 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r packages install}
+
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(scales)
+library(readxl)
+library(rstatix)
+```
+
 # Part 1: Foundational Exercises
 
 ## 1.1 Professional Magic
@@ -30,7 +41,7 @@ This will be the alpha
 ## 1.2 Wrong Test, Right Data - Kevin
 In the likert scale the "distance" between the different options is not consistent, thus violating the metric scale assumption needed to run a paired t-test. We could suggest a paired sign test where the only only assumptions needed are: ordinal variables and i.i.d. 
 
-## 1.3 Test Assumptions - Giorgio and Annie 
+## 1.3 Test Assumptions - Giorggio and Annie 
 
 ### 1.3.1 World Happiness 
 Scenario: We have two variables: Life.Ladder and Log.GDP.per.Capita, and we want to see whether countries in high GDP per capita are more or less happy than people in countries with low GDP per capita. 
@@ -40,17 +51,41 @@ Assumptions for two-sample t-test
 2. i.i.d. - yes (assuming same data collection and data transformation procuedures), explain 
 3. Metric variables - yes, explain 
 
-```{r}
-wh_data <- read.csv('datasets/happiness_WHR.csv')
+https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
 
-# Calculate the mean GDP per capita 
+```{r}
+# Load in dataset 
+wh_data_raw <- read.csv('datasets/happiness_WHR.csv')
+
+# Select necessary variables 
+wh_data <- wh_data_raw %>% select(Life.Ladder, Log.GDP.per.capita)
+
+# Get a quick look at the two relevant variables 
+summary (wh_data$Life.Ladder)
+summary(wh_data$Log.GDP.per.capita)
+
+# Calculate the mean GDP per capita (will be useful in sorting high and low GDP per capita countries)
+gdp_capita_mean <- mean(wh_data$Life.Ladder, na.rm = TRUE)
+gdp_capita_mean
 
 # Split the data into low and high gdp per capita countries 
+## But first remove rows that have NAs 
+wh_data_fin <- na.omit(wh_data)
+## Now split into the high and low gdp per capita country groups
+high_gdp_cap <- wh_data_fin %>% filter(Log.GDP.per.capita > gdp_capita_mean)
+high_gdp_cap
 
-# Check out histograms of both variables 
+low_gdp_cap <- wh_data_fin %>% filter(Log.GDP.per.capita < gdp_capita_mean)
+low_gdp_cap
+
+# Observe the histograms of both variables 
+hist(high_gdp_cap$Life.Ladder) #make pretty 
+
+#hist(low_gdp_cap$Life.Ladder) #fix #make pretty 
 
 # Can do a Shapiro test as an extra source of evidence to test for normalcy
-# https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r
+shapiro_test1 <- wh_data_fin %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
+shapiro_test1_results <- as.data.frame(shapiro_test1)
 ```
 
 ### 1.3.2 Legislators 
@@ -70,6 +105,22 @@ leg_data <- read.csv('datasets/legislators-current.csv')
 # Check whether the variables have the similar shape/spread - box whisker plot or histogram 
 
 # Check for some metric on similarities between the two variable distributions
+
+
+summary(legislators_current$'birthday')
+summary(legislators_current$'type')
+#str(birth_date)  to get the format of the dates
+
+sub_dem <- legislators_current[legislators_current$'type' == 'sen', ]
+sub_rep <- legislators_current[legislators_current$'type' == 'rep', ]
+
+today_date <- as.Date("2022-02-20")
+
+birth_date_dem <- as.numeric(difftime(today_date, as.Date(sub_dem$'birthday'), unit = "weeks"))/52.25 
+birth_date_rep <- as.numeric(difftime(today_date, as.Date(sub_rep$'birthday'), unit = "weeks"))/52.25 
+
+hist(birth_date_dem)
+hist(birth_date_rep)
 ```
 
 ### 1.3.3 Wine and Health 
@@ -88,6 +139,14 @@ wine_data  <- wine
 
 # test for symmetry 
 
+install.packages("wooldridge")
+library(wooldridge)
+# ?wine
+
+summary(wine)
+diff_hearth_liver <- as.numeric(wine$heart - wine$liver)
+hist(diff_hearth_liver)
+
 ```
 
 ### 1.3.4 Attitudes Toward the Religion 
@@ -103,6 +162,10 @@ Assumptions for a Paired t-Test
 rel_data <- read.csv('datasets/GSS_religion.csv')
 
 # Check for normalcy with histograms, and can do also the Shapiro test 
+
+summary(GSS_religion)
+hist(GSS_religion$prottemp)
+hist(GSS_religion$cathtemp)
 ```
 
 # Part 2: Statistical Analysis
