@@ -18,6 +18,7 @@ library(tidyverse)
 library(scales)
 library(readxl)
 library(rstatix)
+library(ggpubr)
 ```
 
 # Part 1: Foundational Exercises
@@ -55,28 +56,26 @@ https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r
 
 ```{r}
 # Load in dataset 
-wh_data_raw <- read.csv('datasets/happiness_WHR.csv')
+wh_data <- read.csv('datasets/happiness_WHR.csv')
 
 # Select necessary variables 
-wh_data <- wh_data_raw %>% select(Life.Ladder, Log.GDP.per.capita)
+wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
 
 # Get a quick look at the two relevant variables 
-summary (wh_data$Life.Ladder)
-summary(wh_data$Log.GDP.per.capita)
+summary (wh_data)
 
 # Calculate the mean GDP per capita (will be useful in sorting high and low GDP per capita countries)
 gdp_capita_mean <- mean(wh_data$Life.Ladder, na.rm = TRUE)
-gdp_capita_mean
 
 # Split the data into low and high gdp per capita countries 
 ## But first remove rows that have NAs 
-wh_data_fin <- na.omit(wh_data)
+wh_data <- na.omit(wh_data)
 ## Now split into the high and low gdp per capita country groups
-high_gdp_cap <- wh_data_fin %>% filter(Log.GDP.per.capita > gdp_capita_mean)
-high_gdp_cap
+high_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita > gdp_capita_mean)
 
-low_gdp_cap <- wh_data_fin %>% filter(Log.GDP.per.capita < gdp_capita_mean)
-low_gdp_cap
+
+low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
+
 
 # Observe the histograms of both variables 
 hist(high_gdp_cap$Life.Ladder) #make pretty 
@@ -84,8 +83,7 @@ hist(high_gdp_cap$Life.Ladder) #make pretty
 #hist(low_gdp_cap$Life.Ladder) #fix #make pretty 
 
 # Can do a Shapiro test as an extra source of evidence to test for normalcy
-shapiro_test1 <- wh_data_fin %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
-shapiro_test1_results <- as.data.frame(shapiro_test1)
+shapiro_test1 <- wh_data %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
 ```
 
 ### 1.3.2 Legislators 
@@ -98,29 +96,30 @@ Assumptions for Wilcoxon Rank-Sum test:
 3. Same shape and spread of the the two variables - box whisker plot, histogram 
 
 ```{r}
+# Load in Data set 
 leg_data <- read.csv('datasets/legislators-current.csv')
 
-# Need to calculate the age for each legislator 
+# Select necessary variables and calculate age 
+leg_data  <- leg_data %>% 
+  select(birthday, party, type) %>%
+  filter(type == 'sen') %>%
+  mutate(age = as.numeric(difftime(Sys.Date(), as.Date(birthday), unit = "weeks"))/52.25)
+leg_data <- leg_data %>% select(party, age)
+
+# Split the data by party
+dem_sen <- leg_data %>% filter(party == 'Democrat')
+rep_sen <- leg_data %>% filter(party == 'Republican')
+indep <- leg_data %>% filter(party == 'Independent') 
+## We see all Senators have been accounted for as the number of rows of above 3 data frames adds up to 100 
+
+# Get a quick look at the relevant variables (Democrats and Republicans only) 
+summary(dem_sen$age)
+summary(rep_sen$age)
 
 # Check whether the variables have the similar shape/spread - box whisker plot or histogram 
-
+hist(dem_sen$age)
+hist(rep_sen$age)
 # Check for some metric on similarities between the two variable distributions
-
-
-summary(legislators_current$'birthday')
-summary(legislators_current$'type')
-#str(birth_date)  to get the format of the dates
-
-sub_dem <- legislators_current[legislators_current$'type' == 'sen', ]
-sub_rep <- legislators_current[legislators_current$'type' == 'rep', ]
-
-today_date <- as.Date("2022-02-20")
-
-birth_date_dem <- as.numeric(difftime(today_date, as.Date(sub_dem$'birthday'), unit = "weeks"))/52.25 
-birth_date_rep <- as.numeric(difftime(today_date, as.Date(sub_rep$'birthday'), unit = "weeks"))/52.25 
-
-hist(birth_date_dem)
-hist(birth_date_rep)
 ```
 
 ### 1.3.3 Wine and Health 
@@ -133,19 +132,19 @@ Assumptions for Wilcoxon Signed Rank Test:
 3. Difference is symmetric - need to test for this
 4. Paired - explain why/why not
 ```{r}
-# install.packages("wooldridge")
+# Load in dataset 
 library(wooldridge)
 wine_data  <- wine
 
-# test for symmetry 
+# Select necessary variables
+wine_data <- wine_data %>% 
+  select(country, heart, liver)
 
-install.packages("wooldridge")
-library(wooldridge)
-# ?wine
-
-summary(wine)
-diff_hearth_liver <- as.numeric(wine$heart - wine$liver)
-hist(diff_hearth_liver)
+# Test for symmetry
+## First calculate the difference between Heart and Liver 
+wine_data <- wine_data %>% mutate(difference = heart - liver)
+## Look at the histogram too see if there is symmetry 
+gghistogram(wine_data, x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
 
 ```
 
@@ -159,13 +158,21 @@ Assumptions for a Paired t-Test
 3. Paired - yes, explain 
 4. Normalcy - Check for this 
 ```{r}
+# Load in dataset 
 rel_data <- read.csv('datasets/GSS_religion.csv')
 
-# Check for normalcy with histograms, and can do also the Shapiro test 
+# Select necessary variables 
+rel_data <- rel_data %>% select(cathtemp, prottemp)
 
-summary(GSS_religion)
-hist(GSS_religion$prottemp)
-hist(GSS_religion$cathtemp)
+# Get a quick look at the relevant variables 
+summary(rel_data)
+
+#Observe the histograms for both variables 
+gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 5)
+gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5)
+
+# Conduct a Shapiro test to also help determine normalcy 
+shapiro_test2 <- rel_data %>% shapiro_test(cathtemp, prottemp)
 ```
 
 # Part 2: Statistical Analysis
