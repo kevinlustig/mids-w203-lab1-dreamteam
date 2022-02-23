@@ -11,6 +11,10 @@ output:
 
 # Part 2: Statistical Analysis
 
+```{r, echo=FALSE}
+anes_data <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
+```
+
 Data source: 2020 American National Election Studies (ANES) - 2020 Time Series Study 
 
 Research question: Did Democratic voters or Republican voters experience more difficulty voting in the 2020 election?
