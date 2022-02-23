@@ -5,13 +5,9 @@ date: "3/1/2022"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r packages install}
+```{r packages install, include=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE)
 library(dplyr)
 library(stringr)
 library(tidyverse)
@@ -58,36 +54,57 @@ Assumptions for two-sample t-test
 
 https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
 
-```{r}
+```{r, include=FALSE}
 # Load in dataset 
 wh_data <- read.csv('datasets/happiness_WHR.csv')
 
 # Select necessary variables 
 wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
+```
 
+```{r}
 # Get a quick look at the two relevant variables 
 summary (wh_data)
+```
 
+```{r}
 # Calculate the mean GDP per capita (will be useful in sorting high and low GDP per capita countries)
-gdp_capita_mean <- mean(wh_data$Life.Ladder, na.rm = TRUE)
+gdp_capita_mean <- round(mean(wh_data$Life.Ladder, na.rm = TRUE), digits = 2)
+print(paste0('Mean of GDP per capita: ', gdp_capita_mean))
+```
 
+```{r}
 # Split the data into low and high gdp per capita countries 
 ## But first remove rows that have NAs 
 wh_data <- na.omit(wh_data)
+```
+
+```{r}
 ## Now split into the high and low gdp per capita country groups
 high_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita > gdp_capita_mean)
+print('Quick look at the variables for high GDP per capita countries:')
+summary(high_gdp_cap)
+```
 
-
+```{r}
 low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
+print('Quick look at the variables for low GDP per capita countries:')
+summary(low_gdp_cap)
+```
 
-
+```{r}
 # Observe the histograms of both variables 
 hist(high_gdp_cap$Life.Ladder) #make pretty 
+```
 
+```{r}
 #hist(low_gdp_cap$Life.Ladder) #fix #make pretty 
+```
 
+```{r}
 # Can do a Shapiro test as an extra source of evidence to test for normalcy
 shapiro_test1 <- wh_data %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
+as.data.frame(shapiro_test1)
 ```
 
 ### 1.3.2 Legislators 
@@ -109,19 +126,32 @@ leg_data  <- leg_data %>%
   filter(type == 'sen') %>%
   mutate(age = as.numeric(difftime(Sys.Date(), as.Date(birthday), unit = "weeks"))/52.25)
 leg_data <- leg_data %>% select(party, age)
+```
 
+```{r}
 # Split the data by party
 dem_sen <- leg_data %>% filter(party == 'Democrat')
 rep_sen <- leg_data %>% filter(party == 'Republican')
 indep <- leg_data %>% filter(party == 'Independent') 
 ## We see all Senators have been accounted for as the number of rows of above 3 data frames adds up to 100 
-
+```
+Summary: Democrat Senators
+```{r}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(dem_sen$age)
+```
+Summary: Republican Senators
+```{r}
+# Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(rep_sen$age)
+```
 
+```{r}
 # Check whether the variables have the similar shape/spread - box whisker plot or histogram 
 hist(dem_sen$age)
+```
+
+```{r}
 hist(rep_sen$age)
 # Check for some metric on similarities between the two variable distributions
 ```
@@ -143,12 +173,14 @@ wine_data  <- wine
 # Select necessary variables
 wine_data <- wine_data %>% 
   select(country, heart, liver)
+```
 
+```{r}
 # Test for symmetry
 ## First calculate the difference between Heart and Liver 
 wine_data <- wine_data %>% mutate(difference = heart - liver)
 ## Look at the histogram too see if there is symmetry 
-gghistogram(wine_data, x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
+gghistogram(wine_data, main = 'Graph', x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
 
 ```
 
@@ -167,16 +199,26 @@ rel_data <- read.csv('datasets/GSS_religion.csv')
 
 # Select necessary variables 
 rel_data <- rel_data %>% select(cathtemp, prottemp)
+```
 
+```{r}
 # Get a quick look at the relevant variables 
 summary(rel_data)
+```
 
+```{r}
 #Observe the histograms for both variables 
 gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 5)
-gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5)
+```
 
+```{r}
+gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5)
+```
+
+```{r}
 # Conduct a Shapiro test to also help determine normalcy 
 shapiro_test2 <- rel_data %>% shapiro_test(cathtemp, prottemp)
+as.data.frame(shapiro_test2)
 ```
 
 # Part 2: Statistical Analysis
