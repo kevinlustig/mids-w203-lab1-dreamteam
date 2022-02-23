@@ -8,6 +8,9 @@ output:
     number_sections: true
     toc_depth: 3
 ---
+```{r , include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=4)
+```
 
 ```{r packages install, include=FALSE}
 
@@ -19,7 +22,7 @@ library(readxl)
 library(rstatix)
 library(ggpubr)
 ```
-
+\newpage
 # Part 1: Foundational Exercises
 
 ## 1.1 Professional Magic
@@ -50,14 +53,17 @@ It is this last point on directionality that suggests an alternative approach to
 ## 1.3 Test Assumptions
 
 ### 1.3.1 World Happiness 
-Scenario: We have two variables: Life.Ladder and Log.GDP.per.Capita, and we want to see whether countries in high GDP per capita are more or less happy than people in countries with low GDP per capita. 
+*Scenario:* We have two variables: Life.Ladder and Log.GDP.per.Capita, and we want to see whether countries in high GDP per capita are more or less happy than people in countries with low GDP per capita.
 
-Assumptions for two-sample t-test 
-1. Normal - CHECK! 
-2. i.i.d. - yes (assuming same data collection and data transformation procuedures), explain 
-3. Metric variables - yes, explain 
+*Proposed test:* Two Sample t-Test
 
-https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
+*Test Assumptions:* 
+1. Metric variables
+2. Random variables are independent and identically distributed (hereby referred to as i.i.d.)
+3. Normalcy of random variables
+
+Both of the variables continuous numeric and metric variables, thus satisfying the first condition.They are also independent and identically distributed based on the fact that the respondents were asked to rank the 
+
 
 ```{r, include=FALSE}
 # Load in dataset 
@@ -67,63 +73,80 @@ wh_data <- read.csv('datasets/happiness_WHR.csv')
 wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Get a quick look at the two relevant variables 
 summary (wh_data)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Calculate the mean GDP per capita (will be useful in sorting high and low GDP per capita countries)
-gdp_capita_mean <- round(mean(wh_data$Life.Ladder, na.rm = TRUE), digits = 2)
-print(paste0('Mean of GDP per capita: ', gdp_capita_mean))
-```
-
-```{r}
-# Split the data into low and high gdp per capita countries 
 ## But first remove rows that have NAs 
 wh_data <- na.omit(wh_data)
+gdp_capita_mean <- round(mean(wh_data$Log.GDP.per.capita), digits = 2)
 ```
-
-```{r}
+Summary: Life Ladder Score and GDP per Capitas > Sample Mean
+```{r, echo=FALSE, comment=""}
 ## Now split into the high and low gdp per capita country groups
 high_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita > gdp_capita_mean)
-print('Quick look at the variables for high GDP per capita countries:')
 summary(high_gdp_cap)
 ```
-
-```{r}
+Summary: Life Ladder Score and GDP per Capitas < Sample Mean
+```{r, echo=FALSE, comment=""}
 low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
-print('Quick look at the variables for low GDP per capita countries:')
 summary(low_gdp_cap)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Observe the histograms of both variables 
-hist(high_gdp_cap$Life.Ladder) #make pretty 
+gghistogram(high_gdp_cap, main = 'Life Ladder Scores: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 5,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 
-```{r}
-#hist(low_gdp_cap$Life.Ladder) #fix #make pretty 
+```{r, echo=FALSE, comment=""}
+#hist($) #fix #make pretty 
+gghistogram(low_gdp_cap, main = 'Life Ladder Scores: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 5,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Can do a Shapiro test as an extra source of evidence to test for normalcy
-shapiro_test1 <- wh_data %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
-as.data.frame(shapiro_test1)
+shapiro.test(low_gdp_cap$Life.Ladder)
 ```
-#### Conduct the test?
-Yes/No
+p > 0.05 (barely) --> normal-ish
+
+```{r, comment=""}
+shapiro.test(low_gdp_cap$Log.GDP.per.capita)
+#https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
+
+```
+p < 0.05 --> not normal 
+
+```{r, echo=FALSE, comment=""}
+# Can do a Shapiro test as an extra source of evidence to test for normalcy
+shapiro.test(high_gdp_cap$Life.Ladder)
+```
+p < 0.05 --> not normal
+
+```{r, comment=""}
+shapiro.test(high_gdp_cap$Log.GDP.per.capita)
+#https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
+
+```
+p < 0.05 --> not normal
+
+**Conduct the test?**
+NO
 
 ### 1.3.2 Legislators 
 
-Scenario: We want to test whether Democratic or Republic senators are older, with two variables party and age (age needs to be calculated from DOB). 
+*Scenario:* We want to test whether Democratic or Republic senators are older, with two variables party and age (age needs to be calculated from DOB). 
 
-Assumptions for Wilcoxon Rank-Sum test:
-1. Ordinal variables - yes, explain 
-2. i.i.d. - yes, explain 
-3. Same shape and spread of the the two variables - box whisker plot, histogram 
+*Proposed test:* Wilxocon Rank Sum Test
 
-```{r}
+*Test Assumptions:*
+1. Ordinal variables
+2. i.i.d. 
+3. Same shape and spread of the the two variables 
+
+```{r, echo=FALSE}
 # Load in Data set 
 leg_data <- read.csv('datasets/legislators-current.csv')
 
@@ -135,7 +158,7 @@ leg_data  <- leg_data %>%
 leg_data <- leg_data %>% select(party, age)
 ```
 
-```{r}
+```{r, echo=FALSE}
 # Split the data by party
 dem_sen <- leg_data %>% filter(party == 'Democrat')
 rep_sen <- leg_data %>% filter(party == 'Republican')
@@ -143,39 +166,55 @@ indep <- leg_data %>% filter(party == 'Independent')
 ## We see all Senators have been accounted for as the number of rows of above 3 data frames adds up to 100 
 ```
 Summary: Democrat Senators
-```{r}
+```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(dem_sen$age)
 ```
 Summary: Republican Senators
-```{r}
+```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(rep_sen$age)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Check whether the variables have the similar shape/spread - box whisker plot or histogram 
-hist(dem_sen$age)
+gghistogram(dem_sen, main = 'Ages of Democrat Senators', x = 'age', fill= 'steelblue', bins = 5, xlab = 'Age', ylab = 'Count')
 ```
 
 ```{r}
-hist(rep_sen$age)
+boxplot(x=dem_sen$age, data = dem_sen,
+        main="Ages of Democrat Senators",
+        ylab="Age",
+        col = 'steelblue')
+```
+
+```{r, echo=FALSE, comment=""}
+# Histogram of Republican senator ages 
+gghistogram(rep_sen, main = 'Ages of Republican Senators', x = 'age', fill= 'steelblue', bins = 5, xlab = 'Age', ylab = 'Count')
 # Check for some metric on similarities between the two variable distributions
 ```
-#### Conduct the test?
-Yes/No
 
+```{r}
+boxplot(x=rep_sen$age, data = rep_sen,
+        main="Ages of Republican Senators",
+        ylab="Age",
+        col = 'steelblue')
+```
+**Conduct the test?**
+Maybe yes?
 
 ### 1.3.3 Wine and Health 
 
-Scenario: We want to test whether these countries have more deaths from heart disease or liver disease.
+*Scenario:* We want to test whether these countries have more deaths from heart disease or liver disease.
 
-Assumptions for Wilcoxon Signed Rank Test:
-1. Metric Variables - yes, explain 
-2. i.i.d. - yes, explain 
-3. Difference is symmetric - need to test for this
-4. Paired - explain why/why not
-```{r}
+*Proposed test:* Wilxocon Signed Rank Test
+
+*Test Assumptions:*
+1. Metric Variables
+2. i.i.d.
+3. Paired data 
+4. Difference is symmetric
+```{r, echo=FALSE}
 # Load in dataset 
 library(wooldridge)
 wine_data  <- wine
@@ -185,7 +224,7 @@ wine_data <- wine_data %>%
   select(country, heart, liver)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Test for symmetry
 ## First calculate the difference between Heart and Liver 
 wine_data <- wine_data %>% mutate(difference = heart - liver)
@@ -195,20 +234,33 @@ boxplot(x=wine_data$difference, data = wine_data,
         col = 'steelblue')
 
 ```
-#### Conduct the test?
-Yes/No
+
+```{r}
+gghistogram(wine_data, main = 'g1', x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
+
+```
+**Conduct the test?**
+Not sure
+
+First box whisker done with advice from https://www.youtube.com/watch?v=Y4-wAT4SNM4&ab_channel=Dr.ToddGrande 
+go to around 6 min
+
+Second chart done with advice from 
+https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/
 
 
 ### 1.3.4 Attitudes Toward the Religion 
 
-Scenario: We would like to know whether the U.S. population feels more positive towards Protestants or Catholics. 
+*Scenario:* We would like to know whether the U.S. population feels more positive towards Protestants or Catholics. 
 
-Assumptions for a Paired t-Test
-1. Metric Variables - yes, explain 
-2. i.i.d. - yes, explain 
-3. Paired - yes, explain 
-4. Normalcy - Check for this 
-```{r}
+*Proposed Test:* Paired t-Test
+
+*Test Assumptions:*
+1. Metric Variables
+2. i.i.d.
+3. Paired
+4. Normalcy
+```{r, echo=FALSE}
 # Load in dataset 
 rel_data <- read.csv('datasets/GSS_religion.csv')
 
@@ -216,31 +268,42 @@ rel_data <- read.csv('datasets/GSS_religion.csv')
 rel_data <- rel_data %>% select(cathtemp, prottemp)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables 
 summary(rel_data)
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 #Observe the histograms for both variables 
-gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 5)
+gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 5, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of US Population Feelings Towards Catholics')
 ```
 
-```{r}
-gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5)
+```{r, echo=FALSE, comment=""}
+gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of US Population Feelings Towards Protestants')
 ```
 
-```{r}
+```{r, echo=FALSE, comment=""}
 # Conduct a Shapiro test to also help determine normalcy 
-shapiro_test2 <- rel_data %>% shapiro_test(cathtemp, prottemp)
-as.data.frame(shapiro_test2)
+shapiro.test(rel_data$cathtemp)
 ```
+p-value < 0.05 --> not normal 
 
-#### Conduct the test?
-Yes/No
-
-
-
-```{r}
-anes_data <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
+```{r, echo=FALSE, comment=""}
+# Conduct a Shapiro test to also help determine normalcy 
+shapiro.test(rel_data$prottemp)
 ```
+p-value < 0.05 --> not normal 
+
+**Conduct the test?**
+No 
+
+
+
+Note on Shapiro wilks test 
+The Shapiro-Wilk test is a statistical test used to check if a continuous variable follows a normal distribution. The null hypothesis (H0) states that the variable is normally distributed, and the alternative hypothesis (H1) states that the variable is NOT normally distributed. So after running this test:
+
+If p <= 0.05: then the null hypothesis can be rejected (i.e. the variable is NOT normally distributed).
+If p > 0.05: then the null hypothesis cannot be rejected (i.e. the variable MAY BE normally distributed).
+
+source: https://quantifyinghealth.com/report-shapiro-wilk-test/
+
