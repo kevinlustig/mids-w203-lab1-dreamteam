@@ -11,6 +11,16 @@ output:
 
 # Part 2: Statistical Analysis
 
+```{r}
+
+source("data_wrangling.R")
+#Loads data and initializes:
+#dv : dataframe containing all respondent rows that were explicitly validated (approx. 10% of total), and all ID, survey response, and basic address columns
+#dv_2016 : similar to dv, but includes only respondents who were also interviewed in 2016
+#This excludes quite a bit of data (8280 rows, 1771 cols down to 808 rows, 1462 cols) that may or may not be interesting in our analysis, but this should be suitable for exploration at least
+
+```
+
 Data source: 2020 American National Election Studies (ANES) - 2020 Time Series Study 
 
 Research question: Did Democratic voters or Republican voters experience more difficulty voting in the 2020 election?
@@ -19,8 +29,6 @@ Define the following:
 1. Democratic voters
 2. Republican voters
 3. Factors contributing to difficulty in voting --> create an index?
-
-Data cleaning and wrangling - Kevin 
 
 Form final dataset 
 
