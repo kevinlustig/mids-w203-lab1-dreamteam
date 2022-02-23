@@ -1,10 +1,13 @@
 ---
-title: 'UCB W203 - Lab 1: Hypothesis Testing'
+title: "Lab One, Part One"
 author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
 date: "3/1/2022"
-output: pdf_document
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    toc_depth: 3
 ---
-
 
 ```{r packages install, include=FALSE}
 
@@ -35,6 +38,7 @@ This will be the alpha
 
 ```
 
+\newpage
 ## 1.2 Wrong Test, Right Data - Kevin
 In the Likert scale, the meaningful distance between the different scale points is not consistent. That is, assuming the Likert scale for the websites survey includes five points from 1 = "Very Unsatisfied" to 5 = "Very Satisfied," with 3 being "Neutral," we cannot say that a change from 1 to 3 and from 2 to 4 are equivalent quantifiable changes in opinion ^[At least, not with only five scale points; see, e.g.: Huiping Wu and Shing-On Leung, “Can Likert Scales Be Treated as Interval Scales?—a Simulation Study,” Journal of Social Service Research 43, no. 4 (June 2017): pp. 527-532, https://doi.org/10.1080/01488376.2017.1329775.]. However, in fact the change in quality of experience necessary for a given respondent to go from Very Unsatisfied with one site to Neutral with the other may in fact be considerably less than the change needed to go from Unsatisfied to Satisfied, though these each consist of a difference of two steps. Therefore, though the values produced are numeric, these data violate one of the assumptions for a paired t-test -- the use of metric, rather than ordinal, data. 
 
@@ -42,6 +46,7 @@ A paired t-test relies on metric data because, like other related tests includin
 
 It is this last point on directionality that suggests an alternative approach to this issue. A non-parametric paired sign test allows us to analyze our ordinal data provided the observations are independent and identically distributed. It does not attempt, like the t-test, to quantify the size of the difference in opinion within pairs, if any. Rather, it treats all positive changes in opinion as equivalent, and likewise with all negative changes. This alternative test has two main drawbacks. First, it does not have the statistical power of a paired t-test. Second, it loses substantial information present in the original survey responses in the form of the exact values within each paired set of responses. However, in doing so, it allows us to avoid the inaccurate mean calculation of the t-test, and focus on a more accurate analysis of a simpler question: do respondents prefer one website over the other? In looking solely at increases or decreases in opinion score, the paired sign test therefore gives us a reasonable expectation of finding such an effect if one exists in the data. 
 
+\newpage
 ## 1.3 Test Assumptions - Giorggio and Annie 
 
 ### 1.3.1 World Happiness 
@@ -106,6 +111,8 @@ hist(high_gdp_cap$Life.Ladder) #make pretty
 shapiro_test1 <- wh_data %>% shapiro_test(Life.Ladder, Log.GDP.per.capita)
 as.data.frame(shapiro_test1)
 ```
+#### Conduct the test?
+Yes/No
 
 ### 1.3.2 Legislators 
 
@@ -155,6 +162,9 @@ hist(dem_sen$age)
 hist(rep_sen$age)
 # Check for some metric on similarities between the two variable distributions
 ```
+#### Conduct the test?
+Yes/No
+
 
 ### 1.3.3 Wine and Health 
 
@@ -179,10 +189,15 @@ wine_data <- wine_data %>%
 # Test for symmetry
 ## First calculate the difference between Heart and Liver 
 wine_data <- wine_data %>% mutate(difference = heart - liver)
-## Look at the histogram too see if there is symmetry 
-gghistogram(wine_data, main = 'Graph', x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
+boxplot(x=wine_data$difference, data = wine_data,
+        main="Difference between Deaths from Heart Disease - Liver Disease",
+        ylab="Number of Deaths",
+        col = 'steelblue')
 
 ```
+#### Conduct the test?
+Yes/No
+
 
 ### 1.3.4 Attitudes Toward the Religion 
 
@@ -220,6 +235,10 @@ gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5)
 shapiro_test2 <- rel_data %>% shapiro_test(cathtemp, prottemp)
 as.data.frame(shapiro_test2)
 ```
+
+#### Conduct the test?
+Yes/No
+
 
 # Part 2: Statistical Analysis
 
