@@ -26,7 +26,7 @@ Data source: 2020 American National Election Studies (ANES) - 2020 Time Series S
 Research question: Did Democratic voters or Republican voters experience more difficulty voting in the 2020 election?
 
 Define the following:
-1. Democratic voters
+1. Democratic voters 
 2. Republican voters
 3. Factors contributing to difficulty in voting --> create an index?
 
