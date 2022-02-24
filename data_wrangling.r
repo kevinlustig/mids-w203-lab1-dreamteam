@@ -53,6 +53,10 @@ data <- data %>% rename_with(~ columns[.])
 ### Voter Status
 #Eliminate anyone who does not have any voter status info or who is not registered and did not vote
 data <- data %>% filter(data$voter_post_vote_status_V202068x > 0)
+# Note that the above drops the 1,227 people who we don't consider voters.
+# Check how many people registered but did not vote 
+sum(data$voter_post_vote_status_V202068x==1)
+# ~650 people registered but did not vote. We will keep this group and consider them "voters" (intended to vote)
 #Not necessary to filter on voter turnout summary, as it is already a summary that includes V202068x
 #data <- data %>% filter(data$voter_turnout_V202109x >= 0)
 
@@ -67,7 +71,6 @@ data <- data %>% filter(data$party_pre_id_V201231x > 0)
 #data <- data %>% filter(data$party_prepost_registration_V202065x > 0)
 #data <- data %>% filter(data$party_post_registration_V202064 > 0)
 
-
 #### Cleanup
 
 ### Looking for columns with all NAs, none found
@@ -77,3 +80,21 @@ data <- data %>% filter(data$party_pre_id_V201231x > 0)
 ### Auto type detection/conversion
 # No need for this, as all selected columns are already Z
 #data <- readr::type_convert(data)
+
+### Determine Party Affiliation 
+
+# Explore: how many are independent with no lean?
+sum(data$party_pre_id_V201231x==4) #719 - a meaningful number
+# We can't consider these members of either D or R party
+# We are choosing NOT to use how they have voted in the past or in this election to tag them as a party
+# Therefore we will leave them as "independent" for now (so we have three possible party tags - D, R, and I)
+# If partyID is 1,2, or 3 (strong dem, not very strong dem, indep-dem), tag with D
+# If partyID is 4 (indep) tag with I 
+# If partyID is 5,6, or 7 (strong rep, not very strong rep, indep-rep), tag with R
+
+data <- data %>%
+  mutate(party = case_when(party_pre_id_V201231x <=3 ~ "D",
+                           party_pre_id_V201231x ==4 ~ "I",
+                           party_pre_id_V201231x >=5 ~ "R"))
+
+table(data$party) # This tells us how many of each we have 
