@@ -3,24 +3,77 @@ library(readr)
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
+#### Build dataset
+
 #Load data
-data <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
+raw <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
 
 #Filter out responses that could not be validated
-data_validated <- data %>% filter(V200004 == "3" & V200006 == "1" & V200007 == "1" & (V200008 == "1" | V200008 == "5"))
+#data_validated <- raw %>% filter(V200004 == "3" & V200006 == "1" & V200007 == "1" & (V200008 == "1" | V200008 == "5"))
 
-#Select respondent ID columns and survey response columns as of interest for exploration
-dv_id <- subset(data_validated, select=V200001:V160001_orig)
-dv_survey <- subset(data_validated, select=V201004:V203008)
-dv <- cbind(dv_id,dv_survey)
+#### Format dataset
 
-#Filter to just respondents who were also surveyed in 2016 in case that's of interest
-dv_2016 <- dv %>% filter(V160001_orig != "-1")
+columns = c(
+  #General info
+  "V200001"="id_V200001",
+  #Voter status
+  "V202068x"="voter_post_vote_status_V202068x",
+  "V202109x"="voter_turnout_V202109x",
+  #Voting difficulty
+  "V201024"="difficulty_manner_voted_V201024",
+  "V202116"="difficulty_when_voted_V202116",
+  "V202117"="difficulty_how_voted_V202117",
+  "V202118"="difficulty_how_usually_votes_V202118",
+  "V202119"="difficulty_how_difficult_V202119",
+  "V202120a"="difficulty_encountered_registration_V202120a",
+  "V202120b"="difficulty_encountered_id_V202120b",
+  "V202120c"="difficulty_encountered_absentee_V202120c",
+  "V202120d"="difficulty_encountered_ballot_V202120d",
+  "V202120e"="difficulty_encountered_polling_place_V202120e",
+  "V202120f"="difficulty_encountered_wait_V202120f",
+  "V202120g"="difficulty_encountered_work_V202120g",
+  "V202120h"="difficulty_encountered_weather_V202120h",
+  "V202120i"="difficulty_encountered_mailing_V202120i",
+  "V202120j"="difficulty_encountered_other_V202120j",
+  "V202120k"="difficulty_encountered_none_V202120k",
+  "V202121"="difficulty_wait_time_V202121",
+  "V202122"="difficulty_time_to_polling_place_V202122",
+  "V202123"="difficulty_didnt_vote_reason_V202123",
+  #Party affiliation
+  "V201231x"="party_pre_id_V201231x",
+  "V202065x"="party_prepost_registration_V202065x",
+  "V202064"="party_post_registration_V202064"
+)
+
+data <- raw %>% select(names(columns))
+data <- data %>% rename_with(~ columns[.])
+
+#### Filtering
+
+### Voter Status
+#Eliminate anyone who does not have any voter status info or who is not registered and did not vote
+data <- data %>% filter(data$voter_post_vote_status_V202068x > 0)
+#Not necessary to filter on voter turnout summary, as it is already a summary that includes V202068x
+#data <- data %>% filter(data$voter_turnout_V202109x >= 0)
+
+### Party Affiliation
+#Eliminate anyone without a summary party ID value
+#NOTE: Only reduces the dataset by < 20 rows - likely most voters that provided vote info also provided party info
+data <- data %>% filter(data$party_pre_id_V201231x > 0)
+
+#Not going to filter on registration because if we have party ID summary, this is enough to decide affiliation
+#However, if lots of voters have conflicting ID and registration, we might want to revisit this
+#NOTE: This significantly reduces the size of the dataset - most respondents don't have values for both of these questions
+#data <- data %>% filter(data$party_prepost_registration_V202065x > 0)
+#data <- data %>% filter(data$party_post_registration_V202064 > 0)
+
+
+#### Cleanup
 
 ### Looking for columns with all NAs, none found
 #not_all_na <- function(x) any(!is.na(x))
 #dv <- dv %>% select(where(not_all_na))
 
-#Auto type detection/conversion
-dv <- readr::type_convert(dv)
-dv_2016 <- readr::type_convert(dv_2016)
+### Auto type detection/conversion
+# No need for this, as all selected columns are already Z
+#data <- readr::type_convert(data)
