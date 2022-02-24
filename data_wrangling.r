@@ -98,3 +98,7 @@ data <- data %>%
                            party_pre_id_V201231x >=5 ~ "R"))
 
 table(data$party) # This tells us how many of each we have 
+
+
+## Difficulty Variables##
+namez<-data.frame(colnames(data))
