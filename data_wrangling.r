@@ -274,3 +274,11 @@ analysis_all_df
 
 ################################################################################
 ## Select relevant variables that will be used for statistical testing ##
+data_fin <- data %>% select(id_V200001,
+                            voter_post_vote_status_V202068x,
+                            party,
+                            diff_index,
+                            diff_subj)
+# Do we want voted or not to be binary? I think it would make more sense
+# mutate(voter = case_when(voter_post_vote_status_V202068x == 2 ~ 1, TRUE ~ 0))
+################################################################################
