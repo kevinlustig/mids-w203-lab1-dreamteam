@@ -31,18 +31,29 @@ library(ggpubr)
 ## 1.1 Professional Magic
 
 ### 1.1.1 Type I Error of the test
-The type I error rate (i.e. false positive) is the probability of rejecting the null hypothesis when it is correct. The type I error would be the probability of getting 0 or 6, with the assumption that p = 0.5 (null). 
+The type I error rate (i.e. false positive) is the probability of rejecting the null hypothesis when it is correct. In this case, the type I error would be the probability of getting 0 or 6 for your test statistic (and therefore rejecting the null) given that the null is true, i.e. p = 1/2. 
 
-This will be the alpha 
-```{r}
-
-```
+$ \text{Let }Z = X_1 + Y_1 + X_2 + Y_2 + X_3 + Y_3 $
+$ P(Z = 0 \text{ or }  Z = 6 | p= \frac{1}{2}) =$
+$ P(Z = 0 | p= \frac{1}{2}) + P(Z = 6 | p= \frac{1}{2}) =  $
+$ \text{ Each flip of the pair is independent from all other flips of that pair.} $
+$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{1}{2}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{1}{2}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{1}{2})] + [P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{1}{2}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{1}{2}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{1}{2})] =  $
+$	[\frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2}] + [\frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2}]  = $
+$ [\frac{1}{4} * \frac{1}{4} * \frac{1}{4}] + [\frac{1}{4} * \frac{1}{4} * \frac{1}{4}] = $
+$ \frac{1}{32} $
 
 ### 1.1.2 Power of test given p = 0.75
+The power of the test is equal to the probability of correctly rejecting the null hypothesis when the null is false and the alternative is true. In this case, the power would be the probability of getting 0 or 6 for our test statistic (and therefore rejecting the null) given that the alternative is true, i.e. p = 3/4.
 
-```{r}
-
-```
+$ \text{Let }Z = X_1 + Y_1 + X_2 + Y_2 + X_3 + Y_3 $
+$ P(Z = 0 \text{ or }  Z = 6 | p= \frac{3}{4}) =$
+$ P(Z = 0 | p= \frac{3}{4}) + P(Z = 6 | p= \frac{3}{4}) =  $
+$ \text{ Each flip of the pair is independent from all other flips of that pair.} $
+$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{3}{4}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{3}{4}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{3}{4})] + [P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{3}{4}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{3}{4}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{3}{4})] =  $
+$	[\frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2}] + [\frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2}] = $
+$ [\frac{3}{8} * \frac{3}{8} * \frac{3}{8}] + [\frac{3}{8} * \frac{3}{8} * \frac{3}{8}] = $
+$ \frac{27}{512} + \frac{27}{512} = $
+$ \frac{27}{256} $
 
 \newpage
 ## 1.2 Wrong Test, Right Data - Kevin
