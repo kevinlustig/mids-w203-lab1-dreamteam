@@ -76,9 +76,10 @@ It is this last point on directionality that suggests an alternative approach to
 2. Random variables are independent and identically distributed (hereby referred to as i.i.d.)
 3. Normality of random variables
 
-The "Life Ladder" variable is composed of continuous values. Data can be classified and distance between values make sense. The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test. Thus, the data type considerations related to the "Log GDP per capita" are not useful. 
+The "Life Ladder" variable is composed of continuous values. Data can be classified and distance between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.
+The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.(Thus, the data type considerations related to the "Log GDP per capita" are not useful.) 
 
-Validating the Independence of the random samples seems hazardous taking into account that countries and people might be linked somehow. In other word, knowing one information about one country might provide information/insights of neighboring countries. The second assumption is not completely verified.
+Validating the Independence of the random samples seems hazardous assuming that countries and people might be linked somehow. In other word, knowing one information about one country might provide information/insights of neighboring countries. The second assumption is not completely verified.
 
 ```{r, include=FALSE}
 # Load in dataset 
@@ -87,7 +88,6 @@ wh_data <- read.csv('datasets/happiness_WHR.csv')
 # Select necessary variables 
 wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
 ```
-
 A data exploration of both "Life.Ladder" and "Log.GDP.per.capita" variables has revealed that "Log.GDP.per.capita" contains 13 Na(s) values. 
 Countries having Na values for the GDP will be omitted for the rest of the study. Two histograms are plotted to help visualizing the distribution of the data.
 The x-axis displays the Life Ladder Scores and the y-axis the frequency of each Life Ladder Score values.These distributions are presented for countries from the "high GDP per capita"  and "Low GDP per capita" groups.
@@ -119,14 +119,14 @@ summary(low_gdp_cap)
 gghistogram(high_gdp_cap, main = 'Life Ladder Scores: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 The distribution is left skewed and contains two peaks. The overall shape does not represent a normal distribution.
-The second distribution (below) contains one single peak closer to the middle of the distribution and shows a symmetric behavior. In that sense, the second distribution seems to be a better approximation of the norma distribution.
+The second distribution (below) contains one single peak closer to the middle of the distribution and shows a symmetric behavior. In that sense, the second distribution seems to be a better approximation of the normal distribution.
  
 
 ```{r, echo=FALSE, comment=""}
 #hist($) #fix #make pretty 
 gghistogram(low_gdp_cap, main = 'Life Ladder Scores: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
-Density plots are used below to better assess the correlation between the samples and the normal distribution. If the Samples data are normal, the black dotes should be closely positioned to the 15 degrees reference line.
+Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dotes closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
 
 ```{r, echo=FALSE, comment=""}
 # Observe the density plots of both variables versus the normal distribution 
@@ -137,7 +137,7 @@ ggqqplot(high_gdp_cap$Life.Ladder, title = "Life Ladder Score from High GDP per 
 # Observe the density plots of both variables versus the normal distribution
 ggqqplot(low_gdp_cap$Life.Ladder, title = "Life Ladder Score from Low GDP per Capita Countries vs Normal Distribution")
 ```
-The positions of black dotes fluctuates around the reference line without forming a straight line.
+The positions of black dotes fluctuates around the reference line without forming a straight line. The visual study of distribution does not provide clear yes/no answer.
 To quantitatively assess the distribution, a Shapiro-Wilk normality test has been performed on both Ladder scores random variables from Low and high GDP countries.
 ```{r, echo=FALSE, comment=""}
 # Can do a Shapiro test as an extra source of evidence to test for normalcy
@@ -166,7 +166,7 @@ shapiro.test(high_gdp_cap$Log.GDP.per.capita)
 p < 0.05 --> not normal
 
 The application of the test over the Life Ladder r.v from the Low GDP countries provides a p value barely superior to 0.05. The distribution may be normally distributed. 
-Nevertheless, it is not the case for High GDP countries with p value inferior than 0.05. The distribution can not be considered as normally distributed.
+Nevertheless, it is not the case for High GDP countries with p value inferior than 0.05. The second distribution can not be considered as normally distributed.
 Hence, the third assumption is not verified.
 
 **Conduct the test?**
@@ -238,7 +238,6 @@ boxplot(x=rep_sen$age, data = rep_sen,
         col = 'steelblue')
 ```
 **Conduct the test?**
-Maybe yes?
 
 The Wilcoxon Rank Sum Test is less restrictive than the Two Sample t-Test. The metric assumption and IID are still required but not the normality of the data anymore.
 The legislators'age variable is made of continuous Values. Data can be classified and distance between values make sense. The variable is indeed a metric variable which satisfies the first assumption. 
@@ -283,8 +282,7 @@ gghistogram(wine_data, main = 'g1', x = 'difference', y = '..density..', fill= '
 **Conduct the test?**
 
 The "heart" and "liver" variables are composed of values obtained by counting which make these variable discrete variables.
-Additionally, the values of both observations can be compared and ranked which corresponds to a similar metric scale.
-The first assumption is verified.
+Additionally, the values of both observations can be compared,ranked as they share the same zero-base reference and counting granularity. Both rv are measured on a similar metric scale. The first assumption is verified.
 
 The distribution of the difference between the paired samples  "heart" and "liver" is slightly left skewed. Moreover the tight and left heights of the density curve at a similar distance to the median are not equivalent. This distribution is not perfectly symmetric around some median. However, we should not expect the differences distribution to be perfectly symmetric especially when the sample size is small. Thus, the assumption of symmetry is difficult to assess here but might be considered as verified.
 
@@ -307,7 +305,7 @@ https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/
 1. Metric Variables
 2. i.i.d.
 3. Paired
-4. Normalcy
+4. Normality
 ```{r, echo=FALSE}
 # Load in dataset 
 rel_data <- read.csv('datasets/GSS_religion.csv')
@@ -351,7 +349,7 @@ p-value < 0.05 --> not normal
 shapiro.test(diff_prottemp_cathtemp)
 ```
 **Conduct the test?**
-The distribution of the differences between US population Feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test value). The differences normality distribution is one of the key criteria to apply a Paired t-test. The normality assumption is not verified, hence the paired t-test can not be applied in this context.
+The distribution of the differences between US population Feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test value). The normality distribution of differences is one of the key criteria to apply a Paired t-test. The normality assumption is not verified, hence the paired t-test can not be applied in this context.
 
 Note on Shapiro wilks test 
 The Shapiro-Wilk test is a statistical test used to check if a continuous variable follows a normal distribution. The null hypothesis (H0) states that the variable is normally distributed, and the alternative hypothesis (H1) states that the variable is NOT normally distributed. So after running this test:
