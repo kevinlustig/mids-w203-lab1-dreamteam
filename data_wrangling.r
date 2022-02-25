@@ -1,18 +1,27 @@
+
+################################################################################
+## Load in necessary packages ##
+
 library(dplyr)
 library(readr)
+library(scales)
+library(tidyverse)
+################################################################################
 
+################################################################################
+## Set working directory ##
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+################################################################################
 
-#### Build dataset
-
+################################################################################
+## Build dataset ##
 #Load data
 raw <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
 
 #Filter out responses that could not be validated
 #data_validated <- raw %>% filter(V200004 == "3" & V200006 == "1" & V200007 == "1" & (V200008 == "1" | V200008 == "5"))
 
-#### Format dataset
-
+# Format dataset
 columns = c(
   #General info
   "V200001"="id_V200001",
@@ -47,20 +56,23 @@ columns = c(
 
 data <- raw %>% select(names(columns))
 data <- data %>% rename_with(~ columns[.])
+################################################################################
 
-#### Filtering
+################################################################################
+## Filter Dataset by Voter Status and Party Affiliation ## 
 
-### Voter Status
+### Voter Status ###
 #Eliminate anyone who does not have any voter status info or who is not registered and did not vote
 data <- data %>% filter(data$voter_post_vote_status_V202068x > 0)
 # Note that the above drops the 1,227 people who we don't consider voters.
+
 # Check how many people registered but did not vote 
 sum(data$voter_post_vote_status_V202068x==1)
 # ~650 people registered but did not vote. We will keep this group and consider them "voters" (intended to vote)
 #Not necessary to filter on voter turnout summary, as it is already a summary that includes V202068x
 #data <- data %>% filter(data$voter_turnout_V202109x >= 0)
 
-### Party Affiliation
+### Party Affiliation ###
 #Eliminate anyone without a summary party ID value
 #NOTE: Only reduces the dataset by < 20 rows - likely most voters that provided vote info also provided party info
 data <- data %>% filter(data$party_pre_id_V201231x > 0)
@@ -71,7 +83,7 @@ data <- data %>% filter(data$party_pre_id_V201231x > 0)
 #data <- data %>% filter(data$party_prepost_registration_V202065x > 0)
 #data <- data %>% filter(data$party_post_registration_V202064 > 0)
 
-#### Cleanup
+## Cleanup
 
 ### Looking for columns with all NAs, none found
 #not_all_na <- function(x) any(!is.na(x))
@@ -98,38 +110,167 @@ data <- data %>%
                            party_pre_id_V201231x >=5 ~ "R"))
 
 table(data$party) # This tells us how many of each we have 
+################################################################################
 
+################################################################################
+## Difficulty Variables ##
 
-## Difficulty Variables##
-namez<-data.frame(colnames(data))
+# namez<-data.frame(colnames(data))
 
-## Subjective difficulty variable only for people who voted; no data to extrapolate to those who didn't vote 
+# Subjective difficulty variable only for people who voted; no data to extrapolate to those who didn't vote 
 # unless we try to make assumptions on the obstacles they may have faced for not voting and then try to extrapolate
 # but then we're not doing it for people who voted for this variable (because we already have it) and we don't have solid
 # information on what exact conditions made it a certain level of difficulty experienced by people who did not vote
-data1 <- data %>% mutate(
-  # didn't vote and voted responses
-  # "I am not registered" - "Registration problem"
+
+## Add in columns combining difficulty scenarios for people who did and did not vote ##
+data <- data %>% mutate(
+  # "PEOPLE WHO DID NOT VOTE - VARIABLE RESPONSE" ~ "PEOPLE WHO DID VOTE - MULTIPLE VARIABLES"
+  # " " ~ "Registration problem" - only people who voted
+  # For people who didn't vote they had option "I am not registered". This could be by choice, as such it is not seen as a difficulty
+  # for people for did not vote; being seen here as choosing not to get registered 
   diff_registration = case_when(
-    difficulty_didnt_vote_reason_V202123 == 5 | 	
-      difficulty_encountered_registration_V202120a == 1 ~ 1,
+    difficulty_encountered_registration_V202120a == 1 ~ 1,
     TRUE ~ 0
   ),
   # "I did not have the correct form of identification" ~ "Concern about identification card"
   diff_idcard = case_when(
-    difficulty_didnt_vote_reason_V202123 == 6 | difficulty_encountered_id_V202120b == 1 ~ 1,
+    difficulty_didnt_vote_reason_V202123 == 6 | 
+      difficulty_encountered_id_V202120b == 1 ~ 1,
     TRUE ~ 0
   ),
-  # "I requested but did not receive an absentee ballot" ~ "Difficulty obtaining an absentee ballot"
-  # Did not include the reason "out of town" for those who didn't vote because we can't assume that was a choice which made it difficult to vote or it was just a choice they made instead of staying in their area of residence to vote
+  # "I requested but did not receive an absentee ballot" ~ "Difficulty obtaining an absentee ballot" 
+  # Did not include the reason "out of town" for those who didn't vote because we can't assume that was a choice which made it
+  # difficult to vote or it was just a choice they made instead of staying in their area of residence to vote
   diff_absentee = case_when(
-    difficulty_didnt_vote_reason_V202123 == 13 | difficulty_encountered_absentee_V202120c == 1 ~ 1, 
+    difficulty_didnt_vote_reason_V202123 == 13 | 
+      difficulty_encountered_absentee_V202120c == 1 ~ 1, 
     TRUE ~ 0
   ),
-  # "Confusion about ballot or machine" - only people who voted 
+  # " " ~ Confusion about ballot or machine" - only people who voted; no equivalent for people who didn't vote
   diff_confusionball = case_when(
     difficulty_encountered_ballot_V202120d == 1 ~ 1, 
-    TRUE~ 0
+    TRUE ~ 0
   ),
-  
+  # "Transportation" ~ "Difficulty getting to polling place"
+  diff_accesspoll = case_when(
+    difficulty_didnt_vote_reason_V202123 == 9 | 	
+      difficulty_encountered_polling_place_V202120e == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # "The line at the polls was too long" ~ "Long wait times"
+  diff_wait = case_when(
+    difficulty_didnt_vote_reason_V202123 == 11 | 
+      difficulty_encountered_wait_V202120f == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # " " ~ Work schedule" - only people who voted
+  # For the variable on people who didn't work, the closest is "Too busy" which may or may not be related to work schedules
+  diff_worksched = case_when(
+    difficulty_encountered_work_V202120g == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # "Bad weather" ~ "Bad weather"
+  diff_weather = case_when(
+    difficulty_didnt_vote_reason_V202123 == 10 |
+      difficulty_encountered_weather_V202120h == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # " " ~ Issue mailing ballot" - only for people who voted; no equivalent for people who didn't vote 
+  diff_ballmail = case_when(
+    difficulty_encountered_mailing_V202120i == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # "Sick or disabled" ~ " " - only people who didn't vote; no equivalent for people who did vote 
+  diff_sick = case_when(
+    difficulty_didnt_vote_reason_V202123 == 8 ~ 1, 
+    TRUE ~ 0
+  ),
+  # "I was not allowed to vote at the polls, even though I tried" ~ " " - only people who didn't vote; no equivalent for people who did vote
+  diff_notallowed = case_when(
+    difficulty_didnt_vote_reason_V202123 == 12 ~ 1,
+    TRUE ~ 0
+  ),
+  # "I did not know where to vote" ~ " " - only people who didn't vote; no equivalent for people who did vote 
+  diff_where = case_when(
+    difficulty_didnt_vote_reason_V202123 == 14 ~ 1,
+    TRUE ~ 0
+  ),
+  # "Other" ~ "Other problem"
+  diff_other = case_when(
+    difficulty_didnt_vote_reason_V202123 == 16 |
+      difficulty_encountered_other_V202120j ~ 1,
+    TRUE ~ 0
+  ), 
+  # SUBJECTIVE VARIABLE 
+  # Because there are 5 levels of difficulty for people who did vote
+  # and only difficult or not for people who didn't vote, this will be 
+  # a binary variable on whether there was any medium level or more of 
+  # difficulty  to max where they didn't vote
+  diff_subj = case_when(
+    difficulty_didnt_vote_reason_V202123 == 5 | #"I am not registered" a difficulty or a choice?
+      difficulty_didnt_vote_reason_V202123 == 6 | 
+      difficulty_didnt_vote_reason_V202123 == 8 |
+      difficulty_didnt_vote_reason_V202123 == 9 |
+      difficulty_didnt_vote_reason_V202123 == 10 |
+      difficulty_didnt_vote_reason_V202123 == 11 |
+      difficulty_didnt_vote_reason_V202123 == 12 |
+      difficulty_didnt_vote_reason_V202123 == 13 |
+      difficulty_didnt_vote_reason_V202123 == 14 | 
+      difficulty_how_difficult_V202119 == 3 |
+      difficulty_how_difficult_V202119 == 4 |
+      difficulty_how_difficult_V202119 == 5 ~ 1,
+    TRUE ~ 0
+  )
 )
+
+
+## Create the Obstacles Index ##
+data <- data %>% mutate(
+  diff_index = select(., diff_registration, 
+                      diff_idcard, 
+                      diff_absentee,
+                      diff_confusionball, 
+                      diff_accesspoll, 
+                      diff_wait, 
+                      diff_worksched, 
+                      diff_weather, 
+                      diff_ballmail, 
+                      diff_sick, 
+                      diff_notallowed, 
+                      diff_where,
+                      diff_other) %>% 
+    rowSums(na.rm = TRUE))
+
+## Quick analysis of different difficulty situations, index, and subjective difficulty 
+
+# Select relevant columns 
+data_analysis <- data %>% select(diff_registration, 
+                                 diff_idcard, 
+                                 diff_absentee,
+                                 diff_confusionball, 
+                                 diff_accesspoll, 
+                                 diff_wait, 
+                                 diff_worksched, 
+                                 diff_weather, 
+                                 diff_ballmail, 
+                                 diff_sick, 
+                                 diff_notallowed, 
+                                 diff_where,
+                                 diff_other, 
+                                 diff_index, 
+                                 diff_subj)
+
+# Create a function that creates a data frame with the counts and % of each option 
+analysis_df <- function(x) {
+  as.data.frame(table(x, useNA = "ifany")) %>%
+    mutate(Perc = scales::percent(Freq/sum(Freq)), accuracy = 1L) %>%
+    select(-accuracy)
+}
+
+# Apply the function on all the columns in the data frame
+analysis_all_df <- apply(data_analysis,2, analysis_df)
+analysis_all_df
+################################################################################
+
+################################################################################
+## Select relevant variables that will be used for statistical testing ##
