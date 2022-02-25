@@ -1,0 +1,85 @@
+---
+title: "stat_test_part-2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r pressure, echo=FALSE}
+library(tidyverse)
+library(rstatix)
+library(ggpubr)
+```
+
+## Hypothesis Testing
+
+## Considering diff_index
+
+### Which test to use?
+
+paired/unpaired?
+- we are using two random variables: diff_index affiliated to Republicans and diff_index associated to Democrats.
+- Republicans and Democrats are two different populations
+-> unpaired
+
+parametric/non parametric?
+- data distrbution is not normal
+-> non parametric test
+
+data type?
+- diff_index is categorical/ordinal variable
+-> Wilcoxon Rank Sum test
+
+### Hypothesis
+
+H0: The diff index is the same for Rep and Dem 
+
+### Code
+
+ONCE data_fin IN THE ENVIRONMENT
+
+
+```{r pressure, echo=FALSE}
+# splitting the dataset in two 
+sub_dem <- data_fin[data_fin$'party' == 'D', ]
+sub_rep <- data_fin[data_fin$'party' == 'R', ]
+```
+
+```{r pressure, echo=FALSE}
+# diff_index distribution for Democrats
+gghistogram(sub_dem$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index', main = 'Difficulty Index: Democrats')
+```
+
+
+```{r pressure, echo=FALSE}
+# diff_index distribution for Republicans
+gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index',  main = 'Difficulty Index: Republicans')
+
+```
+
+alt="two.sided"?
+conf.level = ... ? what is the confidence interval we would like?
+
+```{r pressure, echo=FALSE}
+wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE)
+```
+
+## Considering diff_subj
+
+### Which test to use?
+
+paired/unpaired?
+- we are using two random variables: diff_index affiliated to Republicans and diff_index associated to Democrats.
+- Republicans and Democrats are two different populations
+-> unpaired
+
+parametric/non parametric?
+- data distrbution is not normal
+-> non parametric test
+
+data type?
+- diff_subj is binary
+->  Wilcoxon again
+->  t test?
