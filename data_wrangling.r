@@ -102,3 +102,34 @@ table(data$party) # This tells us how many of each we have
 
 ## Difficulty Variables##
 namez<-data.frame(colnames(data))
+
+## Subjective difficulty variable only for people who voted; no data to extrapolate to those who didn't vote 
+# unless we try to make assumptions on the obstacles they may have faced for not voting and then try to extrapolate
+# but then we're not doing it for people who voted for this variable (because we already have it) and we don't have solid
+# information on what exact conditions made it a certain level of difficulty experienced by people who did not vote
+data1 <- data %>% mutate(
+  # didn't vote and voted responses
+  # "I am not registered" - "Registration problem"
+  diff_registration = case_when(
+    difficulty_didnt_vote_reason_V202123 == 5 | 	
+      difficulty_encountered_registration_V202120a == 1 ~ 1,
+    TRUE ~ 0
+  ),
+  # "I did not have the correct form of identification" ~ "Concern about identification card"
+  diff_idcard = case_when(
+    difficulty_didnt_vote_reason_V202123 == 6 | difficulty_encountered_id_V202120b == 1 ~ 1,
+    TRUE ~ 0
+  ),
+  # "I requested but did not receive an absentee ballot" ~ "Difficulty obtaining an absentee ballot"
+  # Did not include the reason "out of town" for those who didn't vote because we can't assume that was a choice which made it difficult to vote or it was just a choice they made instead of staying in their area of residence to vote
+  diff_absentee = case_when(
+    difficulty_didnt_vote_reason_V202123 == 13 | difficulty_encountered_absentee_V202120c == 1 ~ 1, 
+    TRUE ~ 0
+  ),
+  # "Confusion about ballot or machine" - only people who voted 
+  diff_confusionball = case_when(
+    difficulty_encountered_ballot_V202120d == 1 ~ 1, 
+    TRUE~ 0
+  ),
+  
+)
