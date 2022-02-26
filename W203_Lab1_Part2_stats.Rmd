@@ -14,6 +14,9 @@ library(ggpubr)
 
 ## Hypothesis Testing
 
+Two tests are performed, one related to the diff_index and one for the diff_subj
+
+
 ## Considering diff_index
 
 ### Which test to use?
@@ -24,7 +27,7 @@ paired/unpaired?
 -> unpaired
 
 parametric/non parametric?
-- data distrbution is not normal
+- data distribution is not normal
 -> non parametric test
 
 data type?
@@ -65,7 +68,6 @@ gghistogram(sub_dem$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty 
 gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index',  main = 'Difficulty Index: Republicans')
 
 ```
-
 ```{r pressure, echo=FALSE}
 
 # is R ranking automatically the values?
@@ -73,17 +75,25 @@ gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty 
 #   wilcox.test(sort(sub_dem$diff_index), sort(sub_rep$diff_index), alternative = "two.sided", paired = FALSE, conf.int = TRUE)
 #   wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
 
-# alt="two.sided"?
+# alt="two.sided"
 # conf.level = ... ? what is the confidence interval we would like?
 # do not need and exact p value -> normal approximation of the p value (by default) is used then
 # conf.int = TRUE to get : "median of the difference between a sample x and a sample from y"
-# effect size r = Z/ sqrt(N), to be calculated manually
 
 
-# what is the wilcox.test argument that differentiate a wilcoxon test under mean hypothesis than wilcoxon test under comparison hypothesis?
+# what is the wilcox.test argument that differentiate a wilcoxon test under mean hypothesis than wilcoxon test under comparison hypothesis?-> mu=0?
 
 wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
 # not warning saying that the sample is to small to get a high confidence interval -> good
+```
+### coding_style 2
+```{r pressure, echo=FALSE}
+data_fin_reduced <- data_fin %>% select(party, diff_index)
+data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
+```
+
+```{r pressure, echo=FALSE}
+wilcox.test(diff_index~party,mu = 0,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
 ```
 
 ## Considering diff_subj
@@ -112,3 +122,14 @@ data type?
 null hypothesis of comparisons
 H0:P(diff_subj_dem<diff_subj_dem) = P(diff_subj_dem>diff_subj_dem)
 
+### Code
+
+```{r pressure, echo=FALSE}
+data_fin_reduced_subj <- data_fin %>% select(party, diff_subj)
+data_fin_reduced_subj <- data_fin_reduced_subj %>% filter(data_fin_reduced_subj$party == 'D' | data_fin_reduced_subj$party == 'R')
+```
+
+```{r pressure, echo=FALSE}
+# no mu this time as it is a (2) hypothesis
+wilcox.test(diff_subj~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced_subj )
+```
