@@ -9,7 +9,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r pressure, echo=FALSE}
 library(tidyverse)
-library(rstatix)
 library(ggpubr)
 ```
 
@@ -29,16 +28,24 @@ parametric/non parametric?
 -> non parametric test
 
 data type?
-- diff_index is categorical/ordinal variable
+- diff_index is metric variable
 -> Wilcoxon Rank Sum test
 
 ### Hypothesis
 
-H0: The diff index is the same for Rep and Dem 
+for an unpaired test:
+
+two options, null hypothesis of means (1) and null hypothesis of comparisons(2)
+
+(1): no diff in mean between the two samples. 
+(2): P(diff_index_dem<diff_index_dem) = P(diff_index_dem>diff_index_dem)
+
+I think we should go for (1) as (2) seems more appropriated for ordinal variable
+
 
 ### Code
 
-ONCE data_fin IN THE ENVIRONMENT
+ONCE data_fin IN THE WORKING ENVIRONMENT
 
 
 ```{r pressure, echo=FALSE}
@@ -59,11 +66,24 @@ gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty 
 
 ```
 
-alt="two.sided"?
-conf.level = ... ? what is the confidence interval we would like?
-
 ```{r pressure, echo=FALSE}
-wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE)
+
+# is R ranking automatically the values?
+#-> yes: same value when calculating:
+#   wilcox.test(sort(sub_dem$diff_index), sort(sub_rep$diff_index), alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+#   wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+
+# alt="two.sided"?
+# conf.level = ... ? what is the confidence interval we would like?
+# do not need and exact p value -> normal approximation of the p value (by default) is used then
+# conf.int = TRUE to get : "median of the difference between a sample x and a sample from y"
+# effect size r = Z/ sqrt(N), to be calculated manually
+
+
+# what is the wilcox.test argument that differentiate a wilcoxon test under mean hypothesis than wilcoxon test under comparison hypothesis?
+
+wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+# not warning saying that the sample is to small to get a high confidence interval -> good
 ```
 
 ## Considering diff_subj
@@ -71,7 +91,7 @@ wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", p
 ### Which test to use?
 
 paired/unpaired?
-- we are using two random variables: diff_index affiliated to Republicans and diff_index associated to Democrats.
+- we are using two random variables: diff_subj affiliated to Republicans and diff_index associated to Democrats.
 - Republicans and Democrats are two different populations
 -> unpaired
 
@@ -79,7 +99,16 @@ parametric/non parametric?
 - data distrbution is not normal
 -> non parametric test
 
+distributions:
+-distri of diff_index_rep and diff_index_dem are really similar 
+
 data type?
-- diff_subj is binary
+- diff_subj is binary /not metric
 ->  Wilcoxon again
-->  t test?
+->  independent sample t test?
+
+### Hypothesis
+
+null hypothesis of comparisons
+H0:P(diff_subj_dem<diff_subj_dem) = P(diff_subj_dem>diff_subj_dem)
+
