@@ -16,7 +16,6 @@ library(ggpubr)
 
 Two tests are performed, one related to the diff_index and one for the diff_subj
 
-
 ## Considering diff_index
 
 ### Which test to use?
@@ -34,9 +33,13 @@ data type?
 - diff_index is metric variable
 -> Wilcoxon Rank Sum test
 
+Considering the large size of our samples >6000 observations -> CLT
+->t test
+
 ### Hypothesis
 
-for an unpaired test:
+
+Wilcoxon hypothesis:
 
 two options, null hypothesis of means (1) and null hypothesis of comparisons(2)
 
@@ -45,11 +48,12 @@ two options, null hypothesis of means (1) and null hypothesis of comparisons(2)
 
 I think we should go for (1) as (2) seems more appropriated for ordinal variable
 
+t-test hypothesis:
+no diff in mean between the two sample
 
-### Code
+### Code distributions
 
 ONCE data_fin IN THE WORKING ENVIRONMENT
-
 
 ```{r pressure, echo=FALSE}
 # splitting the dataset in two 
@@ -62,12 +66,13 @@ sub_rep <- data_fin[data_fin$'party' == 'R', ]
 gghistogram(sub_dem$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index', main = 'Difficulty Index: Democrats')
 ```
 
-
 ```{r pressure, echo=FALSE}
 # diff_index distribution for Republicans
 gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index',  main = 'Difficulty Index: Republicans')
 
 ```
+### Code: Wilcoxon
+#### coding style 1
 ```{r pressure, echo=FALSE}
 
 # is R ranking automatically the values?
@@ -83,10 +88,9 @@ gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty 
 
 # what is the wilcox.test argument that differentiate a wilcoxon test under mean hypothesis than wilcoxon test under comparison hypothesis?-> mu=0?
 
-wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
-# not warning saying that the sample is to small to get a high confidence interval -> good
+wilcox.test(sub_dem$diff_index, sub_rep$diff_index, mu = 0,  alternative = "two.sided", paired = FALSE, conf.int = TRUE)
 ```
-### coding_style 2
+#### coding style 2
 ```{r pressure, echo=FALSE}
 data_fin_reduced <- data_fin %>% select(party, diff_index)
 data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
@@ -94,6 +98,23 @@ data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | 
 
 ```{r pressure, echo=FALSE}
 wilcox.test(diff_index~party,mu = 0,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
+```
+
+### Code: t-test
+
+
+```{r pressure, echo=FALSE}
+# one assumption for the t-test (old version) is: similar variances
+# to check if variances from diff_index (democrats) and diff_index (republicans) are similar: use of the F-test
+var.test(diff_index~party, data = data_fin_reduced)
+```
+- ratio of variances different than one.
+- lower and upper bounds (from the confidence interval) are higher than 1
+-> variances are really different
+-> not sure we can use the t-test (old version) then,  nevertheless we can use the Welch's version of the t-test (apparently, default test in R)
+
+```{r pressure, echo=FALSE}
+t.test(diff_index~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
 ```
 
 ## Considering diff_subj
@@ -122,7 +143,7 @@ data type?
 null hypothesis of comparisons
 H0:P(diff_subj_dem<diff_subj_dem) = P(diff_subj_dem>diff_subj_dem)
 
-### Code
+### Code Wilcoxon
 
 ```{r pressure, echo=FALSE}
 data_fin_reduced_subj <- data_fin %>% select(party, diff_subj)
@@ -133,3 +154,5 @@ data_fin_reduced_subj <- data_fin_reduced_subj %>% filter(data_fin_reduced_subj$
 # no mu this time as it is a (2) hypothesis
 wilcox.test(diff_subj~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced_subj )
 ```
+
+
