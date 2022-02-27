@@ -1,7 +1,7 @@
 ---
-title: "Part Two"
-author: "PUT YOUR GROUP NAMES HERE"
-date: "2/14/2022"
+title: "Influence of Party Affiliation on Reported Voting Difficulty"
+author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
+date: "2/29/2022"
 output:
   pdf_document:
     toc: true
@@ -9,35 +9,175 @@ output:
     toc_depth: 3
 ---
 
-# Part 2: Statistical Analysis
+  \newpage
+\setcounter{page}{1}
 
-```{r}
+```{r setup and load packages, include=FALSE}
+theme_set(theme_bw())
 
+options(tinytex.verbose = TRUE)
+knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+
+library(tidyverse)
+library(ggpubr)
+```
+
+```{r load data, include=FALSE}
 source("data_wrangling.R")
-#Loads data and initializes:
-#dv : dataframe containing all respondent rows that were explicitly validated (approx. 10% of total), and all ID, survey response, and basic address columns
-#dv_2016 : similar to dv, but includes only respondents who were also interviewed in 2016
-#This excludes quite a bit of data (8280 rows, 1771 cols down to 808 rows, 1462 cols) that may or may not be interesting in our analysis, but this should be suitable for exploration at least
+```
+
+```{r echo=FALSE}
+data_fin_reduced <- data_fin %>% select(party, diff_index, diff_subj)
+data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
+
+# splitting the dataset in two 
+sub_dem <- data_fin_reduced[data_fin_reduced$'party' == 'D', ]
+sub_rep <- data_fin_reduced[data_fin_reduced$'party' == 'R', ]
 
 ```
 
-Data source: 2020 American National Election Studies (ANES) - 2020 Time Series Study 
+```{r plot diff_index echo=FALSE}
+# diff_index distribution for Democrats
+gghistogram(sub_dem$diff_index, bins = 6, fill= 'steelblue', xlab = 'Total instances of difficulty reported', main = 'Difficulty Index: Democrats')
+```
+```{r echo=FALSE}
+# diff_index distribution for Republicans
+gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Total instances of difficulty reported',  main = 'Difficulty Index: Republicans')
+```
+```{r echo=FALSE}
+# diff_subj distribution for Democrats
+gghistogram(sub_dem$diff_subj, bins = 2, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Democrats')
+```
+```{r echo=FALSE}
+# diff_subj distribution for Republicans
+gghistogram(sub_rep$diff_subj, bins=2, fill= 'steelblue', xlab = 'Had/did not have difficulty voting',  main = 'Self-Reported Difficulty: Republicans')
+```
+```{r echo=FALSE}
+t.test(diff_index~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
+```
 
-Research question: Did Democratic voters or Republican voters experience more difficulty voting in the 2020 election?
+```{r echo=FALSE}
+t.test(diff_subj~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
+```
 
-Define the following:
-1. Democratic voters 
-2. Republican voters
-3. Factors contributing to difficulty in voting --> create an index?
+# Importance and Context
 
-Form final dataset 
+The topic of obstacles to voting has been the focus of considerable discussion in the United States in recent years, including notably before, during, and since the 2020 federal election. The debate over the facility with which Americans are able to vote has elicited claims both that voting in practice is too restrictive and challenging to allow for participation by all would-be voters and contrarily that it is so open and unrestricted that fraudulent voting can and does occur with limited recourse. Perhaps unsurprisingly, these assertions have largely arisen along partisan lines, and have been used as evidence in support of (often contradictory) changes to voting laws by elected officials and their supporters in both major political parties. Those affiliated with the Democratic Party are more likely to feel that it is too difficult to vote and support efforts to increase access to the polls, while Republican Party supporters are more likely to support restrictions on voting access. Naturally, the partisan nature of this debate means that voting behavior itself has been impacted, for example with Democratic voters significantly more likely to vote early and by mail than Republican voters in 2020, both methods widely discussed as fraught with error and likely to be fraudulent by prominent members of the Republican party. 
 
-EDA and basic information on the variables and proof we can make assumptions needed for tests we will run
+Naturally, this raises the question of whether the actual experience of difficulty voting is related as well to party affiliation. Perhaps attitudes toward measures to loosen or tighten voting regulations are driven by real or perceived differences in personal experience with voting difficulty. This analysis therefore attempts to examine the linkage, if any, between political party identification and difficulty voting. We seek to address the following research question: 
 
-Run tests
+*Did Democrats or Republicans have more difficulty voting in the 2020 election?
 
-Interpret tests
+This question has the potential to illuminate important aspects of the debate on measures to change voting laws. Namely, is it possible that Democrat-associated policies to ease voting regulations are based on an actual increased level of difficulty voting for Democrats as compared to Republicans (and likewise for Republican efforts to further restrict voting?) What is the scale of the actual voting difficulty for members of each party, and who would be most affected and in what way by changes meant to address the current ease or difficulty of voting? 
 
-Create visualizations (if not done before)
+# Data and Methodology
 
-Write report
+# Results
+
+# Discussion
+
+
+
+### Working code
+
+```{r echo=FALSE}
+# splitting the dataset in two 
+sub_dem <- data_fin[data_fin$'party' == 'D', ]
+sub_rep <- data_fin[data_fin$'party' == 'R', ]
+```
+
+```{r echo=FALSE}
+# diff_index distribution for Democrats
+gghistogram(sub_dem$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index', main = 'Difficulty Index: Democrats')
+```
+
+```{r echo=FALSE}
+# diff_index distribution for Republicans
+gghistogram(sub_rep$diff_index, bins = 6, fill= 'steelblue', xlab = 'Difficulty index',  main = 'Difficulty Index: Republicans')
+
+```
+### Code: Wilcoxon
+#### coding style 1
+```{r echo=FALSE}
+
+# is R ranking automatically the values?
+#-> yes: same value when calculating:
+#   wilcox.test(sort(sub_dem$diff_index), sort(sub_rep$diff_index), alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+#   wilcox.test(sub_dem$diff_index, sub_rep$diff_index, alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+
+# alt="two.sided"
+# conf.level = ... ? what is the confidence interval we would like?
+# do not need and exact p value -> normal approximation of the p value (by default) is used then
+# conf.int = TRUE to get : "median of the difference between a sample x and a sample from y"
+
+
+# what is the wilcox.test argument that differentiate a wilcoxon test under mean hypothesis than wilcoxon test under comparison hypothesis?-> mu=0?
+
+wilcox.test(sub_dem$diff_index, sub_rep$diff_index, mu = 0,  alternative = "two.sided", paired = FALSE, conf.int = TRUE)
+```
+#### coding style 2
+```{r echo=FALSE}
+data_fin_reduced <- data_fin %>% select(party, diff_index)
+data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
+```
+
+```{r pressure, echo=FALSE}
+wilcox.test(diff_index~party,mu = 0,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
+```
+
+### Code: t-test
+
+
+```{r echo=FALSE}
+# one assumption for the t-test (old version) is: similar variances
+# to check if variances from diff_index (democrats) and diff_index (republicans) are similar: use of the F-test
+var.test(diff_index~party, data = data_fin_reduced)
+```
+- ratio of variances different than one.
+- lower and upper bounds (from the confidence interval) are higher than 1
+-> variances are really different
+-> not sure we can use the t-test (old version) then,  nevertheless we can use the Welch's version of the t-test (apparently, default test in R)
+
+```{r echo=FALSE}
+t.test(diff_index~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
+```
+
+## Considering diff_subj
+
+### Which test to use?
+
+paired/unpaired?
+- we are using two random variables: diff_subj affiliated to Republicans and diff_index associated to Democrats.
+- Republicans and Democrats are two different populations
+-> unpaired
+
+parametric/non parametric?
+- data distrbution is not normal
+-> non parametric test
+
+distributions:
+-distri of diff_index_rep and diff_index_dem are really similar 
+
+data type?
+- diff_subj is binary /not metric
+->  Wilcoxon again
+->  independent sample t test?
+
+### Hypothesis
+
+null hypothesis of comparisons
+H0:P(diff_subj_dem<diff_subj_dem) = P(diff_subj_dem>diff_subj_dem)
+
+### Code Wilcoxon
+
+```{r pressure, echo=FALSE}
+data_fin_reduced_subj <- data_fin %>% select(party, diff_subj)
+data_fin_reduced_subj <- data_fin_reduced_subj %>% filter(data_fin_reduced_subj$party == 'D' | data_fin_reduced_subj$party == 'R')
+```
+
+```{r pressure, echo=FALSE}
+# no mu this time as it is a (2) hypothesis
+wilcox.test(diff_subj~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced_subj )
+```
+
+
