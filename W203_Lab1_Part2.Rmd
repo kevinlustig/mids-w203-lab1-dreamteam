@@ -33,7 +33,7 @@ source("data_wrangling.R")
 ```
 
 ```{r echo=FALSE}
-data_fin_reduced <- data_fin %>% select(party, diff_index, diff_subj)
+data_fin_reduced <- data_fin %>% select(party, diff_index, diff_subj, diff_subj2)
 data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
 
 # splitting the dataset in two 
@@ -70,6 +70,16 @@ gghistogram(sub_dem$diff_subj, bins = 2, fill= 'steelblue', xlab = 'Had/did not 
 ```{r echo=FALSE}
 # diff_subj distribution for Republicans
 gghistogram(sub_dem$diff_subj, bins = 2, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Republicans')
+
+```
+```{r echo=FALSE}
+# diff_subj distribution for Democrats
+gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Democrats')
+
+```
+```{r echo=FALSE}
+# diff_subj distribution for Republicans
+gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Republicans')
 
 ```
 ```{r make summary table} 
@@ -149,7 +159,11 @@ t.test(diff_subj~party,alternative = "two.sided",data = data_fin_reduced )
 data_fin_no_vote_difficulty = data_fin %>% filter(voter_post_vote_status_V202068x == 1 & diff_subj == 1 & (party == "R" | party == "D"))
 ```
 
-The results of this test are similar to the first in that they do not provide evidence that there is a difference in the voting difficulty experienced between the two parties even when considering voters who experienced difficulty and did not cast a vote (t=-.73054,p=.4651). This is not unexpected given that registered voters who did not cast a vote after having experienced difficulty voting make up only a very small portion of all Republican and Democratic voters (132 voters).  
+The results of this test are similar to the first in that they do not provide evidence that there is a difference in the voting difficulty experienced between the two parties even when considering voters who experienced difficulty and did not cast a vote (t=-0.34506,p=7301). This is not unexpected given that registered voters who did not cast a vote after having experienced difficulty voting make up only a very small portion of all Republican and Democratic voters (132 voters).  
+
+```{r echo=TRUE}
+wilcox.test(diff_subj2~party,alternative = "two.sided",data = data_fin_reduced )
+```
 
 It is important to note some key limitations of this approach given that it looks across all voters captured in the ANES dataset. Factors that are not considered in this analysis are quite likely to have an impact on the experience of voting difficulty. Among these is method of voting; voting through different methods may in fact be a strategy by individual voters to address anticipated difficulty voting (especially in a 2020 election cycle made more challenging by the COVID-19 pandemic.) Additionally, voters in different locations may have different experiences of voting difficulty given that elections are administered differently across state and local jurisdictions. Further analysis that attempts to analyze differences across methods and locations would be a valuable addition to these findings. 
 
