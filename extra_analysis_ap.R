@@ -123,7 +123,7 @@ table(data$party) # This tells us how many of each we have
 # information on what exact conditions made it a certain level of difficulty experienced by people who did not vote
 
 ## Add in columns combining difficulty scenarios for people who did and did not vote ##
-data <- data %>% mutate(
+data2 <- data %>% mutate(
   # "PEOPLE WHO DID NOT VOTE - VARIABLE RESPONSE" ~ "PEOPLE WHO DID VOTE - MULTIPLE VARIABLES"
   # " " ~ "Registration problem" - only people who voted
   # For people who didn't vote they had option "I am not registered". This could be by choice, as such it is not seen as a difficulty
@@ -134,16 +134,14 @@ data <- data %>% mutate(
   ),
   # "I did not have the correct form of identification" ~ "Concern about identification card"
   diff_idcard = case_when(
-    difficulty_didnt_vote_reason_V202123 == 6 | 
-      difficulty_encountered_id_V202120b == 1 ~ 1,
+    difficulty_encountered_id_V202120b == 1 ~ 1,
     TRUE ~ 0
   ),
   # "I requested but did not receive an absentee ballot" ~ "Difficulty obtaining an absentee ballot" 
   # Did not include the reason "out of town" for those who didn't vote because we can't assume that was a choice which made it
   # difficult to vote or it was just a choice they made instead of staying in their area of residence to vote
   diff_absentee = case_when(
-    difficulty_didnt_vote_reason_V202123 == 13 | 
-      difficulty_encountered_absentee_V202120c == 1 ~ 1, 
+    difficulty_encountered_absentee_V202120c == 1 ~ 1, 
     TRUE ~ 0
   ),
   # " " ~ Confusion about ballot or machine" - only people who voted; no equivalent for people who didn't vote
@@ -153,14 +151,12 @@ data <- data %>% mutate(
   ),
   # "Transportation" ~ "Difficulty getting to polling place"
   diff_accesspoll = case_when(
-    difficulty_didnt_vote_reason_V202123 == 9 | 	
-      difficulty_encountered_polling_place_V202120e == 1 ~ 1, 
+    difficulty_encountered_polling_place_V202120e == 1 ~ 1, 
     TRUE ~ 0
   ),
   # "The line at the polls was too long" ~ "Long wait times"
   diff_wait = case_when(
-    difficulty_didnt_vote_reason_V202123 == 11 | 
-      difficulty_encountered_wait_V202120f == 1 ~ 1, 
+    difficulty_encountered_wait_V202120f == 1 ~ 1, 
     TRUE ~ 0
   ),
   # " " ~ Work schedule" - only people who voted
@@ -171,8 +167,7 @@ data <- data %>% mutate(
   ),
   # "Bad weather" ~ "Bad weather"
   diff_weather = case_when(
-    difficulty_didnt_vote_reason_V202123 == 10 |
-      difficulty_encountered_weather_V202120h == 1 ~ 1, 
+    difficulty_encountered_weather_V202120h == 1 ~ 1, 
     TRUE ~ 0
   ),
   # " " ~ Issue mailing ballot" - only for people who voted; no equivalent for people who didn't vote 
@@ -180,65 +175,15 @@ data <- data %>% mutate(
     difficulty_encountered_mailing_V202120i == 1 ~ 1, 
     TRUE ~ 0
   ),
-  # "Sick or disabled" ~ " " - only people who didn't vote; no equivalent for people who did vote 
-  diff_sick = case_when(
-    difficulty_didnt_vote_reason_V202123 == 8 ~ 1, 
-    TRUE ~ 0
-  ),
-  # "I was not allowed to vote at the polls, even though I tried" ~ " " - only people who didn't vote; no equivalent for people who did vote
-  diff_notallowed = case_when(
-    difficulty_didnt_vote_reason_V202123 == 12 ~ 1,
-    TRUE ~ 0
-  ),
-  # "I did not know where to vote" ~ " " - only people who didn't vote; no equivalent for people who did vote 
-  diff_where = case_when(
-    difficulty_didnt_vote_reason_V202123 == 14 ~ 1,
-    TRUE ~ 0
-  ),
-  # "Other" ~ "Other problem"
   diff_other = case_when(
-    difficulty_didnt_vote_reason_V202123 == 16 |
-      difficulty_encountered_other_V202120j ~ 1,
+    difficulty_encountered_other_V202120j == 1~ 1,
     TRUE ~ 0
   ), 
-  # SUBJECTIVE VARIABLE 
-  # Because there are 5 levels of difficulty for people who did vote
-  # and only difficult or not for people who didn't vote, this will be 
-  # a binary variable on whether there was any medium level or more of 
-  # difficulty  to max where they didn't vote
-  diff_subj = case_when(
-    difficulty_didnt_vote_reason_V202123 == 6 | 
-      difficulty_didnt_vote_reason_V202123 == 8 |
-      difficulty_didnt_vote_reason_V202123 == 9 |
-      difficulty_didnt_vote_reason_V202123 == 10 |
-      difficulty_didnt_vote_reason_V202123 == 11 |
-      difficulty_didnt_vote_reason_V202123 == 12 |
-      difficulty_didnt_vote_reason_V202123 == 13 |
-      difficulty_didnt_vote_reason_V202123 == 14 | 
-      difficulty_how_difficult_V202119 == 3 |
-      difficulty_how_difficult_V202119 == 4 |
-      difficulty_how_difficult_V202119 == 5 ~ 1,
-    TRUE ~ 0
-  ), 
-  diff_subj2 = case_when(
-    difficulty_didnt_vote_reason_V202123 == 6 | 
-      difficulty_didnt_vote_reason_V202123 == 8 |
-      difficulty_didnt_vote_reason_V202123 == 9 |
-      difficulty_didnt_vote_reason_V202123 == 10 |
-      difficulty_didnt_vote_reason_V202123 == 11 |
-      difficulty_didnt_vote_reason_V202123 == 12 |
-      difficulty_didnt_vote_reason_V202123 == 13 |
-      difficulty_didnt_vote_reason_V202123 == 14 ~ 2,
-    difficulty_how_difficult_V202119 == 3 |
-      difficulty_how_difficult_V202119 == 4 |
-      difficulty_how_difficult_V202119 == 5 ~ 1,
-    TRUE ~ 0
-  )
 )
 
 
 ## Create the Obstacles Index ##
-data <- data %>% mutate(
+data2 <- data2 %>% mutate(
   diff_index = select(., diff_registration, 
                       diff_idcard, 
                       diff_absentee,
@@ -248,16 +193,13 @@ data <- data %>% mutate(
                       diff_worksched, 
                       diff_weather, 
                       diff_ballmail, 
-                      diff_sick, 
-                      diff_notallowed, 
-                      diff_where,
                       diff_other) %>% 
     rowSums(na.rm = TRUE))
 
 ## Quick analysis of different difficulty situations, index, and subjective difficulty 
 
 # Select relevant columns 
-data_analysis <- data %>% select(diff_registration, 
+data_analysis2 <- data2 %>% select(diff_registration, 
                                  diff_idcard, 
                                  diff_absentee,
                                  diff_confusionball, 
@@ -266,34 +208,26 @@ data_analysis <- data %>% select(diff_registration,
                                  diff_worksched, 
                                  diff_weather, 
                                  diff_ballmail, 
-                                 diff_sick, 
-                                 diff_notallowed, 
-                                 diff_where,
                                  diff_other, 
-                                 diff_index, 
-                                 diff_subj, 
-                                 diff_subj2)
+                                 diff_index)
 
 # Create a function that creates a data frame with the counts and % of each option 
-analysis_df <- function(x) {
+analysis_df2 <- function(x) {
   as.data.frame(table(x, useNA = "ifany")) %>%
     mutate(Perc = scales::percent(Freq/sum(Freq)), accuracy = 1L) %>%
     select(-accuracy)
 }
 
 # Apply the function on all the columns in the data frame
-analysis_all_df <- apply(data_analysis,2, analysis_df)
-analysis_all_df
-################################################################################
+analysis_all_df2 <- apply(data_analysis2,2, analysis_df2)
+analysis_all_df2
 
-################################################################################
-## Select relevant variables that will be used for statistical testing ##
-data_fin <- data %>% select(id_V200001,
-                            voter_post_vote_status_V202068x,
-                            party,
-                            diff_index,
-                            diff_subj, 
-                            diff_subj2)
-# Do we want voted or not to be binary? I think it would make more sense
-# mutate(voter = case_when(voter_post_vote_status_V202068x == 2 ~ 1, TRUE ~ 0))
-################################################################################
+
+## Based on above list of dfs from analysis_all_df2
+# Total in our dataset is 7035
+# Total who answered 1 or more difficulties of those who voted is 956
+# Total of those who encountered 1 difficulty is 762
+# Percentage of those enountered 1 difficulty 
+762/956 
+# you get 79.7% 
+

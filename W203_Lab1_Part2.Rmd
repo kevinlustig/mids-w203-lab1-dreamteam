@@ -12,6 +12,10 @@ output:
   \newpage
 \setcounter{page}{1}
 
+```{r , include=FALSE}
+knitr::opts_chunk$set(fig.width=3, fig.height=2)
+```
+
 ```{r setup and load packages, include=FALSE}
 
 options(tinytex.verbose = TRUE)
@@ -44,7 +48,7 @@ The topic of obstacles to voting has been the focus of considerable discussion i
 
 Naturally, this raises the question of whether the actual experience of difficulty voting is related as well to party affiliation. Perhaps attitudes toward measures to loosen or tighten voting regulations are driven by real or perceived differences in personal experience with voting difficulty. This analysis therefore attempts to examine the linkage, if any, between political party identification and difficulty voting. We seek to address the following research question: 
 
-*Did Democrats or Republicans have more difficulty voting in the 2020 election?
+*Did Democrats or Republicans have more difficulty voting in the 2020 election?*
 
 This question has the potential to illuminate important aspects of the debate on measures to change voting laws. Namely, is it possible that Democrat-associated policies to ease voting regulations are based on an actual increased level of difficulty voting for Democrats as compared to Republicans (and likewise for Republican efforts to further restrict voting?) What is the scale of the actual voting difficulty for members of each party, and who would be most affected and in what way by changes meant to address the current ease or difficulty of voting? 
 
@@ -91,6 +95,39 @@ kable(
   booktabs = TRUE, 
 )
 ```
+This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study. *Need to add anything more in here? like sampling/representation maybe?? pre and post voting?? also maybe something on using only post interview people? there was some filter applied no?*
+
+In order to answer the research question *Did Democrats or Republicans have more difficulty voting in the 2020 election?*, three conceptualization questions need to be answered:
+1. Who or what is a **voter**?
+2. Who is a Republican and who is a Democrat; i.e. How do we define **party affiliation**?
+3. What is **difficulty in voting**?
+
+Depending on how voters, party affiliation, and difficulty in voting are defined, different assumptions can be made which can influence the results. For this study, the below definitions and assumptions have been applied:
+
+*Voter*
+
+
+*Party Affiliation*
+
+
+
+*Difficulty in Voting*
+Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The ANES dataset had variables which specifically asked those who had voted whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc.) and how difficult voters found it to vote. The dataset also included variables asking how voters (who voted) voted (in person or via absentee ballot) and reasons as to why people did not vote. After much review and reflection, the researchers decided to two variables to measure difficulty in voting: 
+1. **Difficulty Index:** This is a synthetic index that was created to showcase the extent of how many different types of obstacles voters faced in trying to vote. It is based off of the group of variables asking respondents who voted whether they encountered a specific type of obstacle, and the main reason a respondent did not vote.  
+
+Of the voters who voted AND indicated facing any sort of difficulty, 79.9% (**how to source the code i did here?**) indicated facing only one difficulty, giving the notion that the majority of voters likely experienced one main difficulty. As such the researchers felt comfortable enough to make the assumption the research team made the assumption that for the respondents who did not vote, the main reason they did not vote was likely the main relevant difficulty they faced which deterred them from being able to cast their vote. This assumption allowed the research team to use this variable to account for the difficulties faced by voters who did not end up voting. 
+
+In the variable outlining why respondents did not vote, most of the answer choices aligned with the same obstacles asked to those who had voted, with some types of difficulty being relevant to only those who voted or those who did not end up voting. To create the difficulty index, the research team created separate binary variables for each type of difficulty: registration issues, not having the correct form of ID, difficulties in receiving absentee ballots, confusion about the ballot or machine, difficulties in getting to the polling place (i.e. transportation issues), long wait times, difficulties with work schedules, bad weather, issues mailing ballots, being sick or disabled, not allowed to vote at the polls after trying, not knowing where to vote, and other. Most of these difficulties mentioned could have happened to those who did or did not end up voting, while some only were relevant to either group of voters. 
+
+After creating the binary variables, the sum of them all was taken to create the difficulty index for each voter. There were no weights applied to this index because based on the data given in the dataset, there was no way to perceive which difficulty was worse than others - especially given that certain difficulties may have been more or less worse for certain voters given their specific personal context. As such, this index is more to highlight the magnitude of the different types of difficulties voters faced. 
+
+2. **Subjective difficulty:** Since the difficulty index is not able to account for how much difficulty each voter encountered, regardless of the difficulty type, the research team also developed a subjective difficulty variable. 
+
+The dataset had a variable in which the levels of difficulties (such as moderate or extreme) of those who did vote in the 2020 election were recorded. No such variable was recorded for those who did not vote, but based on *ANNIE TO FINISH BASED ON WHAT IS DECIDED REGARDING WHICH SUBJECTIVE DIFFICULTY VARIABLE TO USE*
+
+
+
+Additionally, it should be noted that this study will focus only on voters affiliated with either the Democratic or Republican party. Additionally, this study will also focus on voters throughout the United States, instead of focusing on specific states, as this study is interested in difficulty in voting at the national level. Further investigation in a future study would be needed to see if our results hold at the state level. 
 
 # Results
 
