@@ -115,11 +115,10 @@ In order to answer the research question *Did Democrats or Republicans have more
 Depending on how voters, party affiliation, and difficulty in voting are defined, different assumptions can be made which can influence the results. For this study, the below definitions and assumptions have been applied:
 
 *Voter*
-
+We define a "voter" as anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters."
 
 *Party Affiliation*
-
-
+In order to determine party affiliation, we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down our results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. The 719 individuals who self-identified as Independents with no party lean are classified as Independents; they remain in our sample for exploration purposes, but the difficulty analysis focuses only on Democrats or Republicans. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. 
 
 *Difficulty in Voting*
 Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The ANES dataset had variables which specifically asked those who had voted whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc.) and how difficult voters found it to vote. The dataset also included variables asking how voters (who voted) voted (in person or via absentee ballot) and reasons as to why people did not vote. After much review and reflection, the researchers decided to two variables to measure difficulty in voting: 
