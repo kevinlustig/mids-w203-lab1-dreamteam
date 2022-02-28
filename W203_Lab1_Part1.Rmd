@@ -73,7 +73,7 @@ It is this last point on directionality that suggests an alternative approach to
 2. Random variables are independent and identically distributed (hereby referred to as i.i.d.)\newline
 3. Normality of random variables\newline
 
-The "Life Ladder" variable is composed of continuous values. Data can be classified and distance between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.
+The "Life Ladder" score (LLS) variable is composed of continuous values. Data can be classified and distance between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.
 The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.(Thus, the data type considerations related to the "Log GDP per capita" are not useful.) 
 
 Validating the Independence of the random samples seems hazardous assuming that countries and people might be linked somehow. In other word, knowing one information about one country might provide information/insights of neighboring countries. The second assumption is not completely verified.
@@ -89,6 +89,7 @@ A data exploration of both "Life.Ladder" and "Log.GDP.per.capita" variables has 
 Countries having Na values for the GDP will be omitted for the rest of the study. Two histograms are plotted to help visualizing the distribution of the data.
 The x-axis displays the Life Ladder Scores and the y-axis the frequency of each Life Ladder Score values.These distributions are presented for countries from the "high GDP per capita"  and "Low GDP per capita" groups.
 
+Summary: Life Ladder Score and GDP per Capita
 ```{r, echo=FALSE, comment=""}
 # Get a quick look at the two relevant variables 
 summary (wh_data)
@@ -100,13 +101,13 @@ summary (wh_data)
 wh_data <- na.omit(wh_data)
 gdp_capita_mean <- round(mean(wh_data$Log.GDP.per.capita), digits = 2)
 ```
-Summary: Life Ladder Score and GDP per Capitas > Sample Mean
+Summary: Life Ladder Score and GDP per Capita > Sample Mean
 ```{r, echo=FALSE, comment=""}
 ## Now split into the high and low gdp per capita country groups
 high_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita > gdp_capita_mean)
 summary(high_gdp_cap)
 ``` 
-Summary: Life Ladder Score and GDP per Capitas < Sample Mean
+Summary: Life Ladder Score and GDP per Capita < Sample Mean
 ```{r, echo=FALSE, comment=""}
 low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
 summary(low_gdp_cap)
@@ -114,7 +115,7 @@ summary(low_gdp_cap)
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 # Observe the histograms of both variables 
-gghistogram(high_gdp_cap, main = 'Life Ladder Scores: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
+gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 
 The distribution is left skewed and contains two peaks. The overall shape does not represent a normal distribution.
@@ -123,19 +124,19 @@ The second distribution (below) contains one single peak closer to the middle of
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 #hist($) #fix #make pretty 
-gghistogram(low_gdp_cap, main = 'Life Ladder Scores: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
+gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 
 Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dotes closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 # Observe the density plots of both variables versus the normal distribution 
-ggqqplot(high_gdp_cap$Life.Ladder, title = "Life Ladder Score from High GDP per Capita Countries vs Normal Distribution" )
+ggqqplot(high_gdp_cap$Life.Ladder, title = "LLS High GDP per Capita Countries vs Normal Dist." )
 ```
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 # Observe the density plots of both variables versus the normal distribution
-ggqqplot(low_gdp_cap$Life.Ladder, title = "Life Ladder Score from Low GDP per Capita Countries vs Normal Distribution")
+ggqqplot(low_gdp_cap$Life.Ladder, title = "LLS Low GDP per Capita Countries vs Normal Dist.")
 ```
 
 The positions of black dotes fluctuates around the reference line without forming a straight line. The visual study of distribution does not provide clear yes/no answer.
