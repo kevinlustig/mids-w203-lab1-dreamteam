@@ -173,15 +173,22 @@ NO: Considering that the normality assumption is not met, the Two Sample t-Test 
 
 ### Legislators 
 
-*Scenario:* We want to test whether Democratic or Republic senators are older, with two variables party and age (age needs to be calculated from DOB). 
+*Scenario:* Test whether Democratic or Republic senators are older, with two variables party and age (age needs to be calculated from DOB). 
 
 *Proposed test:* Wilcoxon Rank Sum Test
 
 *Test Assumptions:* \newline
-1. Metric variable or ordinal variables \newline CHECK
+1. Metric variable or ordinal variables \newline 
 2. i.i.d. \newline
-3. Same shape and spread of the the two variables \newline
+3. Same shape and spread of the two samples \newline
 
+The Wilcoxon Rank Sum Test is less restrictive than the Two Sample t-Test. The metric assumption and IID are still required but not the normality of the data anymore.
+
+The age variable (of the legislators) is made of continuous values in which the distances between the values make sense. The variable is metric and satisfies the first assumption. 
+
+The ages of the legislators come from the same distribution (politicians' ages) is also independent and identically distributed. Moreover, a politician's age does not provide information about the age of any other politician, which satisfies the independence condition and thus the IID, satisfying the second assumption. 
+
+The third assumption regarding the shape and spread of the of the two-party samples of the legislator ages. A summary of their distributions and visual aids of their sample distributions (histograms and box and whisker plot) will help determine whether this assumption is satisfied. 
 ```{r, echo=FALSE, comment=""}
 # Load in Data set 
 leg_data <- read.csv('datasets/legislators-current.csv')
@@ -205,42 +212,38 @@ Summary: Democrat Senators
 ```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(dem_sen$age)
+x <-var(dem_sen$age)
 ```
+
 Summary: Republican Senators
 ```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(rep_sen$age)
+print(var(rep_sen$age))
+```
+Looking at the summaries of the two samples, the distributions do not seem to be too different, as evidenced by the close means, 1st quartile, and maximum. 
+
+```{r, echo=FALSE, comment="", fig.width=5, fig.height=3, fig.align='center'}
+# Map smoke to fill, make the bars NOT stacked, and make them semitransparent
+leg_data1 <- leg_data %>% filter(party != 'Independent')
+ggplot(leg_data1, aes(x = age, fill = party)) +
+  geom_histogram(position = "identity", alpha = 0.4, bins = 15) + ggtitle("Age of Legislators") +
+  xlab("Age") + ylab("Count")+labs(fill='Party')
 ```
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-# Check whether the variables have the similar shape/spread - box whisker plot or histogram 
-gghistogram(dem_sen, main = 'Ages of Democrat Senators', x = 'age', fill= 'steelblue', bins = 5, xlab = 'Age', ylab = 'Count')
+```{r, echo=FALSE, comment="", fig.width=5, fig.height=4, fig.align='center'}
+boxplot( rep_sen$age, dem_sen$age, data = dem_sen,
+        main="Age of Legislators",
+        xlab="Age",
+        col = c('lightpink','lightblue'), 
+        horizontal = TRUE, 
+        names = c('Democrat', 'Republican'))
 ```
+Looking closer at the sample distributions in the above figures, it seems that while the distributions may not FINISH 
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-boxplot(x=dem_sen$age, data = dem_sen,
-        main="Ages of Democrat Senators",
-        ylab="Age",
-        col = 'steelblue')
-```
-
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-# Histogram of Republican senator ages 
-gghistogram(rep_sen, main = 'Ages of Republican Senators', x = 'age', fill= 'steelblue', bins = 5, xlab = 'Age', ylab = 'Count')
-# Check for some metric on similarities between the two variable distributions
-```
-
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-boxplot(x=rep_sen$age, data = rep_sen,
-        main="Ages of Republican Senators",
-        ylab="Age",
-        col = 'steelblue')
-```
 
 **Conduct the test?**\newline
-The Wilcoxon Rank Sum Test is less restrictive than the Two Sample t-Test. The metric assumption and IID are still required but not the normality of the data anymore.
-The legislators' age variable is made of continuous values. Data can be classified and the distances between values make sense. The variable is indeed a metric variable which satisfies the first assumption. 
-Considering IID; All Republicans and Democrats' age are from the same distribution, namely politicians' ages. It satisfies the identically distributed consideration. Moreover, a politician's age doess not provide information about the age of any other politician, which satisfies the independence condition and thus the IID. Considering these elements, the Wilcoxon Rank Sum test is applicable.
+CHECK Considering these elements, the Wilcoxon Rank Sum test is applicable.
 
 ### Wine and Health 
 
@@ -253,48 +256,34 @@ Considering IID; All Republicans and Democrats' age are from the same distributi
 2. i.i.d.\newline
 3. Paired data \newline
 4. Difference is symmetric\newline
+
+The "heart" and "liver" variables are both composed of values obtained by counting, which make these discrete variables. Additionally, the values of both observations can be compared and ranked as they share the same zero-base reference and counting granularity. Both random variables are measured on a similar metric scale. Thus the first assumption is verified.
+
+IID PAIRD ADD
 ```{r, echo=FALSE, comment=""}
 # Load in dataset 
 library(wooldridge)
 wine_data  <- wine
-
 # Select necessary variables
 wine_data <- wine_data %>% 
   select(country, heart, liver)
 ```
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
+```{r, echo=FALSE, comment="", fig.width=5, fig.height=3, fig.align='center'}
 # Test for symmetry
 ## First calculate the difference between Heart and Liver 
 wine_data <- wine_data %>% mutate(difference = heart - liver)
-boxplot(x=wine_data$difference, data = wine_data,
-        main="Difference between Deaths from Heart Disease - Liver Disease",
-        ylab="Number of Deaths",
-        col = 'steelblue')
 
+boxplot( wine_data$difference, data = wine_data,
+        main="Difference between Heart Disease & Liver Disease",
+        xlab="Number of Deaths",
+        col = 'lightblue', 
+        horizontal = TRUE)
 ```
-
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-gghistogram(wine_data, main = 'g1', x = 'difference', y = '..density..', fill= 'steelblue', bins = 5, add_density = TRUE)
-
-```
+The distribution of the difference between the paired samples  "heart" and "liver" is slightly left skewed. Moreover the tight and left heights of the density curve at a similar distance to the median are not equivalent. This distribution is not perfectly symmetric around some median. However, we should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small (n=21). Thus, the assumption of symmetry is difficult to assess here but could be considered as verified.
 
 **Conduct the test?**\newline
-The "heart" and "liver" variables are both composed of values obtained by counting, which make these discrete variables.
-Additionally, the values of both observations can be compared and ranked as they share the same zero-base reference and counting granularity. Both rv are measured on a similar metric scale. The first assumption is verified.
-
-The distribution of the difference between the paired samples  "heart" and "liver" is slightly left skewed. Moreover the tight and left heights of the density curve at a similar distance to the median are not equivalent. This distribution is not perfectly symmetric around some median. However, we should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small. Thus, the assumption of symmetry is difficult to assess here but might be considered as verified.
-
-The Wilcoxon Signed Rank Test can be applied in that context, with some cautions. 
-
-*Sources*
-
-First box whisker done with advice from https://www.youtube.com/watch?v=Y4-wAT4SNM4&ab_channel=Dr.ToddGrande 
-go to around 6 min
-
-Second chart done with advice from 
-https://www.datanovia.com/en/lessons/wilcoxon-test-in-r/
-
+The Wilcoxon Signed Rank Test can be applied in that context, with some caution. 
 
 ### Attitudes Toward the Religion 
 
@@ -354,17 +343,3 @@ shapiro.test(diff_prottemp_cathtemp)
 **Conduct the test?** 
 \newline
 The distribution of the differences between US population feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test values). The normality distribution of differences is one of the key criteria to apply a Paired t-test. The normality assumption is not verified, hence the paired t-test can not be applied in this context.
-
-*Note on Shapiro wilks test*
-
-
-The Shapiro-Wilk test is a statistical test used to check if a continuous variable follows a normal distribution. The null hypothesis (H0) states that the variable is normally distributed, and the alternative hypothesis (H1) states that the variable is NOT normally distributed. So after running this test:
-
-If p <= 0.05: then the null hypothesis can be rejected (i.e. the variable is NOT normally distributed).
-If p > 0.05: then the null hypothesis cannot be rejected (i.e. the variable MAY BE normally distributed).
-
-
-*Source*
-
-https://quantifyinghealth.com/report-shapiro-wilk-test/
-
