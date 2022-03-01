@@ -373,7 +373,6 @@ If p <= 0.05: then the null hypothesis can be rejected (i.e. the variable is NOT
 If p > 0.05: then the null hypothesis cannot be rejected (i.e. the variable MAY BE normally distributed).
 
 
-
 *Source*
 
 https://quantifyinghealth.com/report-shapiro-wilk-test/
