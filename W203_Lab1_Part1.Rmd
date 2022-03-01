@@ -78,8 +78,6 @@ It is this last point on directionality that suggests an alternative approach to
 The "Life Ladder" score (LLS) variable is composed of continuous values. Data can be classified and the distances between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.s
 The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.
 
-DOUBLE CHECK THIS PP Validating the independence of the random samples seems hazardous assuming that countries and people might be linked somehow. In other words, knowing some information about one country might provide information/insights about neighboring countries. The second assumption is not completely verified.
-
 Assuming that data collection and transformation protocols were followed in similar fashion throughout the data collection and transformation activities, it can be assumed that the random variables are independant and identically distributed. 
 
 ```{r, include=FALSE}
@@ -169,7 +167,7 @@ The Shapiro Wilk test for the GDP per capita of high countries has a p-value of 
 Given that the results from the Shapiro Wilk test barely indicated normality for the life ladder scores for low GDP per capita countries and did NOT indicate normality for the life ladder scores for high GDP per capita countries, the third assumption of normality is not validated.\newline
 
 **Conduct the test?**\newline
-NO: Considering that the normality assumption is not met, the Two Sample t-Test would not be best suited for this context.
+Considering that the normality assumption is not met, the Two Sample t-Test would not be best suited for this context.
 
 ### Legislators 
 
@@ -219,7 +217,6 @@ Summary: Republican Senators
 ```{r, echo=FALSE, comment=""}
 # Get a quick look at the relevant variables (Democrats and Republicans only) 
 summary(rep_sen$age)
-print(var(rep_sen$age))
 ```
 Looking at the summaries of the two samples, the distributions do not seem to be too different, as evidenced by the close means, 1st quartile, and maximum. 
 
@@ -239,11 +236,15 @@ boxplot( rep_sen$age, dem_sen$age, data = dem_sen,
         horizontal = TRUE, 
         names = c('Democrat', 'Republican'))
 ```
-Looking closer at the sample distributions in the above figures, it seems that while the distributions may not FINISH 
+Looking closer at the sample distributions in the above figures, it still doesn't seem clear whether the spread and shape of the distributions are the same. To double check, the Ansari Bradley test can be done to test this. The null hypothesis in this test is that the two population distribution functions corresponding to the two samples are identical against the alternative hypothesis that they differ.^["Ansari-Bradley Test", https://www.quality-control-plan.com/StatGuide/ansari.htm]
 
+```{r, echo=FALSE, comment="", fig.width=5, fig.height=4, fig.align='center'}
+ansari.test(dem_sen$age, rep_sen$age)
+```
+The results from the Ansari-Bradley test shows a p-value of 0.2162, indicating that the null should not be rejected and that it is likely that the spread and shape of the distribution functions corresponding to the two samples are the same. The third assumption seems to be satisfied.
 
 **Conduct the test?**\newline
-CHECK Considering these elements, the Wilcoxon Rank Sum test is applicable.
+Given that all the assumption seems to be satisfied, the Wilcoxon Rank Sum test would be applicable in this case. 
 
 ### Wine and Health 
 
@@ -259,7 +260,9 @@ CHECK Considering these elements, the Wilcoxon Rank Sum test is applicable.
 
 The "heart" and "liver" variables are both composed of values obtained by counting, which make these discrete variables. Additionally, the values of both observations can be compared and ranked as they share the same zero-base reference and counting granularity. Both random variables are measured on a similar metric scale. Thus the first assumption is verified.
 
-IID PAIRD ADD
+The heart disease and liver disease variables come from their respective distributions and with the assumption that the data was collected and transformed following the same protocol, the second assumption of independent and identically distributions can be satisfied. 
+
+Another assumption of the Wilcoxon signed rank test is that it is conducted on paired data. In this case since the data is coming from the same test subject (the selected group of countries), it is confirmed that this assumption is satisfied. 
 ```{r, echo=FALSE, comment=""}
 # Load in dataset 
 library(wooldridge)
@@ -280,7 +283,7 @@ boxplot( wine_data$difference, data = wine_data,
         col = 'lightblue', 
         horizontal = TRUE)
 ```
-The distribution of the difference between the paired samples  "heart" and "liver" is slightly left skewed. Moreover the tight and left heights of the density curve at a similar distance to the median are not equivalent. This distribution is not perfectly symmetric around some median. However, we should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small (n=21). Thus, the assumption of symmetry is difficult to assess here but could be considered as verified.
+The distribution of the difference between the paired samples  "heart" and "liver" is a bit left skewed. Moreover this distribution does not seem to be symmetric around the median. However, one should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small (n=21). Thus, the assumption of symmetry is difficult to assess here but could be considered as verified.
 
 **Conduct the test?**\newline
 The Wilcoxon Signed Rank Test can be applied in that context, with some caution. 
@@ -296,6 +299,12 @@ The Wilcoxon Signed Rank Test can be applied in that context, with some caution.
 2. i.i.d.\newline
 3. Paired\newline
 4. Normality\newline
+
+The feeling thermometer variables towards both Protestants and Catholics is continuous and metric in nature since the respondents can choose their rating on a continuous scale from 0 to 100. Thus the first condition is satisfied 
+
+The two feeling thermometer variables seem to also be independent and identically distributed assuming that the conductors of the 2004 General Social Survey were following the same protocol in collecting and transforming these data - satsifying the second condition. 
+
+The paired t-test requires the data be "paired." This is true in this case because the test-subjects, i.e. the respondents, for both the feeling thermometer towards Protestants and Catholoics are the same - satisfying the third condition. 
 ```{r, echo=FALSE, comment=""}
 # Load in dataset 
 rel_data <- read.csv('datasets/GSS_religion.csv')
@@ -311,35 +320,39 @@ summary(rel_data)
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 #Observe the histograms for both variables 
-gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 5, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of US Population Feelings Towards Catholics')
+gghistogram(rel_data$cathtemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of U.S. Feelings, Catholics')
 ```
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
-gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 5, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of US Population Feelings Towards Protestants')
+gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of U.S. Feelings, Protestants')
 ```
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
-gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 5, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of the differences between US Population Feelings toward Catholics and Protestants')
+gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
+
+Looking at the above to histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
 
 ```{r, echo=FALSE, comment=""}
 # Conduct a Shapiro test to also help determine normality 
 shapiro.test(rel_data$cathtemp)
 ```
-p-value < 0.05 --> not normal 
-
+The results of the Shapiro-Wilk test on the feelings thermometer towards Catholics, has a p-value that is close to 0, indicating this variable does not have a normal distribution.  
 ```{r, echo=FALSE, comment=""}
 # Conduct a Shapiro test to also help determine normality 
 shapiro.test(rel_data$prottemp)
 ```
-p-value < 0.05 --> not normal 
+The results of the Shapiro-Wilk test on the feelings thermometer towards Protestants, has a p-value that is close to 0, indicating this variable does not have a normal distribution. 
 
 ```{r, echo=FALSE, comment=""}
 # Conduct a Shapiro test to also help determine normality 
 shapiro.test(diff_prottemp_cathtemp)
 ```
+For the difference, the results also show here a p-value less than 0.05, indicating that the difference distribution is not normal. 
+
+Based on the results of the visual investigation and Shapiro-Wilk tests, the third condition of normality is not met. 
 
 **Conduct the test?** 
 \newline
-The distribution of the differences between US population feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test values). The normality distribution of differences is one of the key criteria to apply a Paired t-test. The normality assumption is not verified, hence the paired t-test can not be applied in this context.
+The distribution of the differences between US population feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test values). The normality distribution of differences is one of the key criteria to apply a Paired t-test. Even though the other criteria regarding metric variables, independent and identical distributions, and paired data are met, the normality assumption is not verified. Hence the paired t-test can not be applied in this context.
