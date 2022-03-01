@@ -34,7 +34,8 @@ $$ \text{Let }Z = X_1 + Y_1 + X_2 + Y_2 + X_3 + Y_3 $$
 $$ P(Z = 0 \text{ or } Z = 6 | p= \frac{1}{2}) =$$
 $$ P(Z = 0 | p= \frac{1}{2}) + P(Z = 6 | p= \frac{1}{2}) =$$
 $$ \text{ Each flip of the pair is independent from all other flips of that pair.} $$
-$$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{1}{2}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{1}{2}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{1}{2})] + [P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{1}{2}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{1}{2}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{1}{2})] =  $$
+$$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{1}{2}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{1}{2}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{1}{2})] + $$ 
+$$[P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{1}{2}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{1}{2}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{1}{2})] =  $$
 $$	[\frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2}] + [\frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2} * \frac{\frac{1}{2}}{2}]  = $$
 $$ [\frac{1}{4} * \frac{1}{4} * \frac{1}{4}] + [\frac{1}{4} * \frac{1}{4} * \frac{1}{4}] = $$
 $$ \frac{1}{32} $$
@@ -46,7 +47,8 @@ $$ \text{Let }Z = X_1 + Y_1 + X_2 + Y_2 + X_3 + Y_3 $$
 $$ P(Z = 0 \text{ or }  Z = 6 | p= \frac{3}{4}) =$$
 $$ P(Z = 0 | p= \frac{3}{4}) + P(Z = 6 | p= \frac{3}{4}) =  $$
 $$ \text{ Each flip of the pair is independent from all other flips of that pair.} $$
-$$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{3}{4}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{3}{4}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{3}{4})] + [P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{3}{4}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{3}{4}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{3}{4})] =  $$
+$$ [P(X_1 = 0 \text{ and } Y_1 = 0 | p= \frac{3}{4}) * P(X_2 = 0 \text{ and } Y_2 = 0 | p= \frac{3}{4}) * P(X_3 = 0 \text{ and } Y_3 = 0 | p= \frac{3}{4})] + $$
+$$[P(X_1 = 1 \text{ and } Y_1 = 1 | p= \frac{3}{4}) * P(X_2 = 1 \text{ and } Y_2 = 1 | p= \frac{3}{4}) * P(X_3 = 1 \text{ and } Y_3 = 1 | p= \frac{3}{4})] =  $$
 $$	[\frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2}] + [\frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2} * \frac{\frac{3}{4}}{2}] = $$
 $$ [\frac{3}{8} * \frac{3}{8} * \frac{3}{8}] + [\frac{3}{8} * \frac{3}{8} * \frac{3}{8}] = $$
 $$ \frac{27}{512} + \frac{27}{512} = $$
@@ -74,9 +76,11 @@ It is this last point on directionality that suggests an alternative approach to
 3. Normality of random variables\newline
 
 The "Life Ladder" score (LLS) variable is composed of continuous values. Data can be classified and the distances between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.s
-The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test. (Thus, the data type considerations related to the "Log GDP per capita" are not useful.) 
+The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.
 
-Validating the independence of the random samples seems hazardous assuming that countries and people might be linked somehow. In other words, knowing some information about one country might provide information/insights about neighboring countries. The second assumption is not completely verified.
+DOUBLE CHECK THIS PP Validating the independence of the random samples seems hazardous assuming that countries and people might be linked somehow. In other words, knowing some information about one country might provide information/insights about neighboring countries. The second assumption is not completely verified.
+
+Assuming that data collection and transformation protocols were followed in similar fashion throughout the data collection and transformation activities, it can be assumed that the random variables are independant and identically distributed. 
 
 ```{r, include=FALSE}
 # Load in dataset 
@@ -85,96 +89,87 @@ wh_data <- read.csv('datasets/happiness_WHR.csv')
 # Select necessary variables 
 wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
 ```
-A data exploration of both "Life.Ladder" and "Log.GDP.per.capita" variables has revealed that "Log.GDP.per.capita" contains 13 Na(s) values. 
-Countries having Na values for the GDP will be omitted for the rest of the study. Two histograms are plotted to help visualizing the distribution of the data.
-The x-axis displays the Life Ladder Scores and the y-axis the frequency of each Life Ladder Score values. These distributions are presented for countries from the "high GDP per capita"  and "Low GDP per capita" groups.
+Now moving on to investigating normality. A quick summary below of both "Life.Ladder" and "Log.GDP.per.capita" variables reveals that "Log.GDP.per.capita" contains 13 Na(s) values. These will be omitted for the rest of this investigation. Additionally, the summary below reveals the mean GDP per capita which will be used as the point to separate low and high GDP per capita countries. 
 
-Summary: Life Ladder Score and GDP per Capita
+**Summary: Life Ladder Score and GDP per Capita**
 ```{r, echo=FALSE, comment=""}
 # Get a quick look at the two relevant variables 
 summary (wh_data)
 ```
 
+Now that the data has been split between low and high GDP per capita countries, a quick look is taken at their respective distribution summaries for the LLS. 
 ```{r, echo=FALSE, comment=""}
 # Calculate the mean GDP per capita (will be useful in sorting high and low GDP per capita countries)
 ## But first remove rows that have NAs 
 wh_data <- na.omit(wh_data)
 gdp_capita_mean <- round(mean(wh_data$Log.GDP.per.capita), digits = 2)
 ```
-Summary: Life Ladder Score and GDP per Capita > Sample Mean
+**Summary: Life Ladder Score for High GDP per Capita Countries**
 ```{r, echo=FALSE, comment=""}
 ## Now split into the high and low gdp per capita country groups
 high_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita > gdp_capita_mean)
-summary(high_gdp_cap)
+summary(high_gdp_cap$Life.Ladder)
 ``` 
-Summary: Life Ladder Score and GDP per Capita < Sample Mean
+**Summary: Life Ladder Score for Low GDP per Capita Countries**
 ```{r, echo=FALSE, comment=""}
 low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
-summary(low_gdp_cap)
+summary(low_gdp_cap$Life.Ladder)
 ```
-
+A quick glance gives the impression that the LLS for both low and high GDP per capita countries may be skewed a bit to the left. This can be confirmed by looking at a visualization of the distribution via histograms (done below). The x-axis displays the Life Ladder Scores and the y-axis the frequency of each Life Ladder Score values. 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 # Observe the histograms of both variables 
 gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
 
-The distribution is left skewed and contains two peaks. The overall shape does not represent a normal distribution.
-The second distribution (below) contains one single peak closer to the middle of the distribution and shows a symmetric behavior. In that sense, the second distribution seems to be a better approximation of the normal distribution.
- 
-
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 #hist($) #fix #make pretty 
 gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
+The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. 
 
-Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dots closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
-
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
+```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
+#Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dots closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
 # Observe the density plots of both variables versus the normal distribution 
 ggqqplot(high_gdp_cap$Life.Ladder, title = "LLS High GDP per Capita Countries vs Normal Dist." )
 ```
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
+```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
 # Observe the density plots of both variables versus the normal distribution
 ggqqplot(low_gdp_cap$Life.Ladder, title = "LLS Low GDP per Capita Countries vs Normal Dist.")
+#The black dots fluctuate around the reference line without forming a straight line. The visual study of this distribution does not provide a clear yes/no answer. 
 ```
+But since a visual investigation does not seem to be the most convincing of the LLS' normality, a Shapiro-Wilk normality test will be performed to quantitatively assess the distribution of the LLS for both high and low GDP per capita countries. The Shapiro Wilk normality test compares the sample distribution to a normal distribution to determine whether or not the data shows serious deviation from normality. The null hypothesis of this test is that our “sample distribution is normal”. If the test is significant, the distribution is not normal.^[Source: "Statistical Tests and assumptions",  https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r.]
 
-The black dots fluctuate around the reference line without forming a straight line. The visual study of this distribution does not provide a clear yes/no answer.
-To quantitatively assess the distribution, a Shapiro-Wilk normality test has been performed on both Ladder scores random variables from Low and high GDP countries.
 ```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normalcy
+# Can do a Shapiro test as an extra source of evidence to test for normality
 shapiro.test(low_gdp_cap$Life.Ladder)
 ```
-p > 0.05 (barely) --> normal-ish
+The Shapiro Wilk test for the LLS distribution for low GDP per capita countries (above) has a p-value of 0.05055, indicating it barely made the cut for us to accept the null that there is no significant difference between the sample and a normal distribution - i.e. the sample is normal (barely). 
 
 ```{r, echo=FALSE, comment=""}
 shapiro.test(low_gdp_cap$Log.GDP.per.capita)
 #https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
 
 ```
-p < 0.05 --> not normal 
+The Shapiro Wilk test for the low GDP per capita country distribution (above) has a p-value of 0.0001319 which is less than 0.05, indicating that the sample is not normal.
 
 ```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normalcy
+# Can do a Shapiro test as an extra source of evidence to test for normality
 shapiro.test(high_gdp_cap$Life.Ladder)
 ```
-p < 0.05 --> not normal
+The Shapiro Wilk test for the LLS distribution for high GDP per capita countries has a p-value of 0.01434, indicating that the null should be rejected and that the sample is not normal. 
 
 ```{r, echo=FALSE, comment=""}
 shapiro.test(high_gdp_cap$Log.GDP.per.capita)
 #https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r 
 
 ```
-p < 0.05 --> not normal
+The Shapiro Wilk test for the GDP per capita of high countries has a p-value of 0.00764, indicating this sample is not normal.
 
-The application of the test over the Life Ladder r.v from the Low GDP countries provides a p value barely superior to 0.05. The distribution may be normally distributed. 
-Nevertheless, it is not the case for High GDP countries with p value inferior than 0.05. The second distribution can not be considered as normally distributed.
-Hence, the third assumption is not verified.
-\newline
-**Conduct the test?**
+Given that the results from the Shapiro Wilk test barely indicated normality for the life ladder scores for low GDP per capita countries and did NOT indicate normality for the life ladder scores for high GDP per capita countries, the third assumption of normality is not validated.\newline
 
-\newline
-Considering the fact that IID may not be satisfied and the random variables are not normally distributed, we conclude that the Two Sample t-Test is not applicable in this context.
+**Conduct the test?**\newline
+NO: Considering that the normality assumption is not met, the Two Sample t-Test would not be best suited for this context.
 
 ### Legislators 
 
@@ -183,7 +178,7 @@ Considering the fact that IID may not be satisfied and the random variables are 
 *Proposed test:* Wilcoxon Rank Sum Test
 
 *Test Assumptions:* \newline
-1. Metric variable //Ordinal variables \newline
+1. Metric variable or ordinal variables \newline CHECK
 2. i.i.d. \newline
 3. Same shape and spread of the the two variables \newline
 
@@ -242,8 +237,7 @@ boxplot(x=rep_sen$age, data = rep_sen,
         col = 'steelblue')
 ```
 
-**Conduct the test?**
-\newline
+**Conduct the test?**\newline
 The Wilcoxon Rank Sum Test is less restrictive than the Two Sample t-Test. The metric assumption and IID are still required but not the normality of the data anymore.
 The legislators' age variable is made of continuous values. Data can be classified and the distances between values make sense. The variable is indeed a metric variable which satisfies the first assumption. 
 Considering IID; All Republicans and Democrats' age are from the same distribution, namely politicians' ages. It satisfies the identically distributed consideration. Moreover, a politician's age doess not provide information about the age of any other politician, which satisfies the independence condition and thus the IID. Considering these elements, the Wilcoxon Rank Sum test is applicable.
@@ -285,16 +279,13 @@ gghistogram(wine_data, main = 'g1', x = 'difference', y = '..density..', fill= '
 
 ```
 
-**Conduct the test?**
-\newline
+**Conduct the test?**\newline
 The "heart" and "liver" variables are both composed of values obtained by counting, which make these discrete variables.
 Additionally, the values of both observations can be compared and ranked as they share the same zero-base reference and counting granularity. Both rv are measured on a similar metric scale. The first assumption is verified.
 
 The distribution of the difference between the paired samples  "heart" and "liver" is slightly left skewed. Moreover the tight and left heights of the density curve at a similar distance to the median are not equivalent. This distribution is not perfectly symmetric around some median. However, we should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small. Thus, the assumption of symmetry is difficult to assess here but might be considered as verified.
 
 The Wilcoxon Signed Rank Test can be applied in that context, with some cautions. 
-
-\newline
 
 *Sources*
 
@@ -344,19 +335,19 @@ gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 5, xlab = 'Feeling
 ```
 
 ```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normalcy 
+# Conduct a Shapiro test to also help determine normality 
 shapiro.test(rel_data$cathtemp)
 ```
 p-value < 0.05 --> not normal 
 
 ```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normalcy 
+# Conduct a Shapiro test to also help determine normality 
 shapiro.test(rel_data$prottemp)
 ```
 p-value < 0.05 --> not normal 
 
 ```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normalcy 
+# Conduct a Shapiro test to also help determine normality 
 shapiro.test(diff_prottemp_cathtemp)
 ```
 
