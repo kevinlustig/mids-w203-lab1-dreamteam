@@ -167,9 +167,9 @@ kable(
 )
 ```
 
-Therefore, we further analyze an additional variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote (Table 2). We then reduce this group to just those who experienced difficulty by excluding those who did not self-report difficulty (Category 1); this group represents a small subset (n=`r count(data_fin_difficulty)`) of the overall Democrat- and Republican-identified surveyed population (n=`r `count(data_fin_reduced)`). Nevertheless, it allows us to focus our analysis on the distribution of voters who encountered voting difficulty and were (Category 2) or were not (Category 3) subsequently able to vote.
+Consequently, we further analyze an additional variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote (Table 2). We then reduce this group to just those who experienced difficulty by excluding those who did not self-report difficulty (Category 1); this group represents a small subset (n=`r count(data_fin_difficulty)`) of the overall Democrat- and Republican-identified surveyed population (n=`r count(data_fin_reduced)`). Nevertheless, it allows us to focus our analysis on the distribution of voters who encountered voting difficulty and were (Category 2) or were not (Category 3) subsequently able to vote.
 
-Using this variable, we test whether there are differences by party in the experience of voting difficulty among those who experienced difficulty:
+Using this variable, we test whether there are differences by party in the ability to complete the process of casting a vote among those who experienced difficulty:
 
 ```{r echo=TRUE}
 wilcox.test(diff_subj2~party,alternative = "two.sided",data = data_fin_difficulty, conf.int=TRUE )
