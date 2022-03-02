@@ -3,13 +3,13 @@ title: "Lab One, Part One"
 author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
 date: "3/1/2022"
 output:
-  word_document:
-    toc: yes
-    toc_depth: '3'
   pdf_document:
     toc: yes
     number_sections: yes
     toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
 ---
 ```{r packages install, include=FALSE}
 
