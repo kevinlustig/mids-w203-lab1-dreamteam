@@ -127,9 +127,8 @@ The distribution for high GDP per capita countries is left skewed and contains t
 The Central Limit Theorem (CLT) states that the distribution of a standardize sample mean converge to a normal curve distribution as the sample size tends to infinity. The CLT requires that data are IID and the population has finite variance. The first statement has already been verified. The finite variance one can be visually assessed via the samples distributions. 
 As the Samples distributions are not heavy tailed distributions, we can assume (with some cautious) that each population has a positive variance. In that context, the CLT seems applicable.
 
-
 **Conduct the test?**\newline
-The application of the Central Limit Theorem satisfies the normality assumption and thus makes the t-test applicable.
+Given that the assumptions are satisfied including the normality assumption, the t-test is applicable.
 
 ### Legislators 
 
