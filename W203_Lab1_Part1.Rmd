@@ -290,7 +290,7 @@ gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Ther
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
-gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
+gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 9, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
 
 Looking at the above summary and two histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
