@@ -3,13 +3,13 @@ title: "Lab One, Part One"
 author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
 date: "3/1/2022"
 output:
+  word_document:
+    toc: yes
+    toc_depth: '3'
   pdf_document:
     toc: yes
     number_sections: yes
     toc_depth: 3
-  word_document:
-    toc: yes
-    toc_depth: '3'
 ---
 ```{r packages install, include=FALSE}
 
@@ -122,37 +122,14 @@ gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life
 #hist($) #fix #make pretty 
 gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
-The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. 
+The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. Considering the samples size, another approach can be taken:
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
-#Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dots closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
-# Observe the density plots of both variables versus the normal distribution 
-ggqqplot(high_gdp_cap$Life.Ladder, title = "LLS High GDP per Capita Countries vs Normal Dist." )
-```
+The Central Limit Theorem (CLT) states that the distribution of a standardize sample mean converge to a normal curve distribution as the sample size tends to infinity. The CLT requires that data are IID and the population has finite variance. The first statement has already been verified. The finite variance one can be visually assessed via the samples distributions. 
+As the Samples distributions are not heavy tailed distributions, we can assume (with some cautious) that each population has a positive variance. In that context, the CLT seems applicable.
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
-# Observe the density plots of both variables versus the normal distribution
-ggqqplot(low_gdp_cap$Life.Ladder, title = "LLS Low GDP per Capita Countries vs Normal Dist.")
-#The black dots fluctuate around the reference line without forming a straight line. The visual study of this distribution does not provide a clear yes/no answer. 
-```
-But since a visual investigation does not seem to be the most convincing of the LLS' normality, a Shapiro-Wilk normality test will be performed to quantitatively assess the distribution of the LLS for both high and low GDP per capita countries. The Shapiro Wilk normality test compares the sample distribution to a normal distribution to determine whether or not the data shows serious deviation from normality. The null hypothesis of this test is that our “sample distribution is normal”. If the test is significant, the distribution is not normal.^[Source: "Statistical Tests and assumptions",  https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r.]
-
-```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normality
-shapiro.test(low_gdp_cap$Life.Ladder)
-```
-The Shapiro Wilk test for the LLS distribution for low GDP per capita countries (above) has a p-value of 0.05055, indicating it barely made the cut for us to accept the null that there is no significant difference between the sample and a normal distribution - i.e. the sample is normal (barely). 
-
-```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normality
-shapiro.test(high_gdp_cap$Life.Ladder)
-```
-The Shapiro Wilk test for the LLS distribution for high GDP per capita countries has a p-value of 0.01434, indicating that the null should be rejected and that the sample is not normal. 
-
-Given that the results from the Shapiro Wilk test barely indicated normality for the life ladder scores for low GDP per capita countries and did NOT indicate normality for the life ladder scores for high GDP per capita countries, the third assumption of normality is not validated.\newline
 
 **Conduct the test?**\newline
-Considering that the normality assumption is not met, the Two Sample t-Test would not be best suited for this context.
+The application of the Central Limit Theorem satisfies the normality assumption and thus makes the t-test applicable.
 
 ### Legislators 
 
