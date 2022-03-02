@@ -125,7 +125,7 @@ gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.L
 The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. Considering the samples size, another approach can be taken:
 
 The Central Limit Theorem (CLT) states that the distribution of a standardize sample mean converge to a normal curve distribution as the sample size tends to infinity. The CLT requires that data are IID and the population has finite variance. The first statement has already been verified. The finite variance one can be visually assessed via the samples distributions. 
-As the Samples distributions are not heavy tailed distributions, we can assume (with some cautious) that each population has a positive variance. In that context, the CLT seems applicable.
+As the Samples distributions are not heavy tailed distributions, we can assume (with caution) that each population has a positive variance. In that context, the CLT seems applicable.
 
 **Conduct the test?**\newline
 Given that the assumptions are satisfied including the normality assumption, the t-test is applicable.
@@ -293,27 +293,9 @@ diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
 gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 9, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
 
-Looking at the above summary and two histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
-
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(rel_data$cathtemp)
-```
-The results of the Shapiro-Wilk test on the feelings thermometer towards Catholics, has a p-value that is close to 0, indicating this variable does not have a normal distribution.  
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(rel_data$prottemp)
-```
-The results of the Shapiro-Wilk test on the feelings thermometer towards Protestants, has a p-value that is close to 0, indicating this variable does not have a normal distribution. 
-
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(diff_prottemp_cathtemp)
-```
-For the difference, the results also show here a p-value less than 0.05, indicating that the difference distribution is not normal. 
-
-Based on the results of the visual investigation and Shapiro-Wilk tests, the third condition of normality is not met. 
+The differences histogram looks symmetrical, not necessarily normal but not heavy-tailed. Considering the large sample size (superior than 800 observations) and the non heavy-tailed behavior (with caution) of the difference distribution, the Central Limit Theorem (CLT) seems applicable. The CLT states that a standardize sample mean distribution converges to a normal curve as n (the sample size) tends to infinity. In this context, the application of the CLT suggests that the normality assumption is satisfied.
 
 **Conduct the test?** 
 \newline
-The distribution of the differences between US population feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test values). The normality distribution of differences is one of the key criteria to apply a Paired t-test. Even though the other criteria regarding metric variables, independent and identical distributions, and paired data are met, the normality assumption is not verified. Hence the paired t-test can not be applied in this context.
+
+The four criteria are met.Hence the paired t-test can be applied.
