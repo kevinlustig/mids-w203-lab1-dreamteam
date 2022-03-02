@@ -79,7 +79,6 @@ The "Life Ladder" score (LLS) variable is composed of continuous values. Data ca
 The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.
 
 Assuming that data collection and transformation protocols were followed in similar fashion throughout the data collection and transformation activities, it can be assumed that the random variables are independent and identically distributed. 
-
 ```{r, include=FALSE}
 # Load in dataset 
 wh_data <- read.csv('datasets/happiness_WHR.csv')
@@ -276,14 +275,14 @@ The Wilcoxon Signed Rank Test can be applied in that context, with some caution.
 
 ### Attitudes Toward the Religion 
 
-*Scenario:* We would like to know whether the U.S. population feels more positive towards Protestants or Catholics. 
+*Scenario:* Investigate whether the U.S. population feels more positive towards Protestants or Catholics. 
 
 *Proposed Test:* Paired t-Test
 
 *Test Assumptions:* \newline
 1. Metric Variables\newline
 2. i.i.d.\newline
-3. Paired\newline
+3. Paired data\newline
 4. Normality\newline
 
 The feeling thermometer variables towards both Protestants and Catholics is continuous and metric in nature since the respondents can choose their rating on a continuous scale from 0 to 100. Thus the first condition is satisfied 
@@ -318,7 +317,7 @@ diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
 gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
 
-Looking at the above to histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
+Looking at the above summary and two histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
 
 ```{r, echo=FALSE, comment=""}
 # Conduct a Shapiro test to also help determine normality 
