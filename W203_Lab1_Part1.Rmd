@@ -170,9 +170,9 @@ The Wilcoxon Rank Sum Test is less restrictive than the Two Sample t-Test. The m
 
 The age variable (of the legislators) is made of continuous values in which the distances between the values make sense. The variable is metric and satisfies the first assumption. 
 
-The ages of the legislators come from the same distribution (politicians' ages) is also independent and identically distributed. Moreover, a politician's age does not provide information about the age of any other politician, which satisfies the independence condition and thus the IID, satisfying the second assumption. 
+The ages of the legislators come from the same distribution (politicians' ages). Moreover, a politician's age does not provide information about the age of any other politician, which satisfies the independence condition and thus the IID, satisfying the second assumption. 
 
-The third assumption regarding the shape and spread of the of the two-party samples of the legislator ages. A summary of their distributions and visual aids of their sample distributions (histograms and box and whisker plot) will help determine whether this assumption is satisfied. 
+A summary of the two sample distributions alongside visual aids (histograms and box and whisker plot) will help determine whether tthe third assumption (same shape and spread) is satisfied. 
 ```{r, echo=FALSE, comment=""}
 # Load in Data set 
 leg_data <- read.csv('datasets/legislators-current.csv')
