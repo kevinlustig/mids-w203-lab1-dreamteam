@@ -216,7 +216,7 @@ This study uses data from the 2020 American National Election Studies (ANES) sur
 
 We consider a *"voter"* to be anyone in the ANES survey sample who registered to vote regardless of whether or not they voted in the 2020 election.^[Survey question V202068x] Since this study examines **difficulty** voting, it is important to consider the subset of people who demonstrated some intention to vote by registering even though they may not have ultimately voted - perhaps because of some difficulty (see *Difficulty Category* below). Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 voters. In order to determine *party affiliation*, we use a self-reported party identification variable.^[Survey question V201231x] Since this study focuses specifically on Democrats and Republicans, we classify anyone who reported a lean or stronger preference for the Democratic Party as a Democrat, and likewise for Republicans. Another possible way to define somebody's party is based on who they voted for, but there is no guarantee in 2020 or any other election that a voter will select the candidate from their party for any particular position. Therefore, we define party affiliation solely based on the self-reported variable. Of the original population, 6316 respondents are identified as Democrat or Republican voters.
 
-We next operationalize the concept of *"difficulty in voting."* Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. The ANES survey provides different information for those who cast a ballot and those who did not. For **respondents who voted,** the ANES survey asks them both to enumerate specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc) and the degree of difficulty they encountered, if any. For **people who did not vote,** the ANES survey asks for the two main reasons they did not vote.^[Variable numbers: V202123 and V202124] This inequality in the data for the two types of voters poses a challenge for analyzing the degree of difficulty faced, which we expand on in describing two variables that we elect to use to represent difficulty: difficulty ranking and difficulty category. 
+We next operationalize the concept of *"difficulty in voting."* Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. The ANES survey provides different information for those who cast a ballot and those who did not. For **respondents who voted,** the ANES survey asks them both to enumerate specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc) and the degree of difficulty they encountered, if any. For **people who did not vote,** the ANES survey asks for the two main reasons they did not vote.^[Survey questions: V202123 and V202124] This inequality in the data for the two types of voters poses a challenge for analyzing the degree of difficulty faced, which we expand on in describing two variables that we elect to use to represent difficulty: difficulty ranking and difficulty category. 
 
 *Difficulty ranking* \newline
 Only respondents who did vote in the 2020 election were posed the question "How difficult was it to vote?" with the following possible responses: not difficult at all (1), a little difficult (2), moderately difficult (3), very difficult (4), extremely difficult (5).^[Survey question V202119; responses such as "no post election data" or "no post election interview" have been filtered out] We employ these values as a simple variable indicator of degree of difficulty voting.
@@ -226,15 +226,24 @@ While the difficulty ranking variable appears to be a straightforward way to ans
 
 In the ANES survey, respondents who did not end up voting were asked to attribute the main reason why.^[Survey question: V202123] It is important to note that these responses enable us to identify not simply voters who had difficulty and also didn't happen to vote; they have provided a specific difficulty as the reason they didn't vote. For this category, we include voters who provided the following responses: (6) "I did not have the correct form of identification", (8) "sick or disabled", (9) "transportation", (10) "bad weather", (11) "the line at the polls was too long", (12) "I was not allowed to vote at the polls, even though I tried", (13) "I requested but did not receive an absentee ballot", (14) "I did not know where to vote", (16) "Other". We disregard responses that indicate the voter forgot or wasn't interested in voting. Those who provided one of these answers to this question were classified as not having experienced difficulty voting.
 
-**Proposed Testing**
+*Proposed Testing Approach* \newline
 Here, we also note another challenge with analyzing our research question: the distribution of the values for both the difficulty ranking and category variables are heavily skewed toward responses that indicate no difficulty voting (difficulty ranking = 1; difficulty category = 1 [Appendix: Figures 1-4]). Thus, we anticipate that measurement of any differences in voting difficulty between voters of the two major parties will be heavily influenced by these tendencies and unlikely to show a significant difference. We validate this supposition through statistical testing in the next section, and then propose an alternate analytical approach to overcome this limitation.
 
-Both the difficulty variables are independent and identically distributed per the ANES survey methodology. Given that the difficulty ranking variable values seem to have an implicit equal distance between each value (no unexpected neutral values or jumps between values), this variable is metric in nature, and thus we employ a two sample t-test. While the values of the difficulty ranking variable are not normally distributed (Appendix: Figures 1 and 2), due to the large sample size (n=6316) a t-test remains a valid approach. The difficulty category variable is ordinal and the party-affiliation samples of that variable show a similar distribution (Appendix: Figures 3 and 4), and thus we utilize the Wilcoxon Rank-Sum test.
+Both the difficulty variables are independent and identically distributed per the ANES survey methodology. Given that the difficulty ranking variable values seem to have an implicit equal distance between each value (no unexpected neutral values or jumps between values), this variable is metric in nature, and thus we employ a two sample t-test, with the null hypothesis stated as:
+
+\begin{quote}
+  \textbf{Null Hypothesis 1:} \textit{The probability that a Democratic voter experienced increased difficulty voting is equal to the probability that a Republican voter experienced increased difficulty voting}
+\end{quote}
+
+While the values of the difficulty ranking variable are not normally distributed (Appendix: Figures 1 and 2), due to the large sample size (n=6316) a t-test remains a valid as the sampling distribution should normal via the Central Limit Theorem. The difficulty category variable is ordinal and the party-affiliation samples of that variable show a similar distribution (Appendix: Figures 3 and 4), and thus we utilize the Wilcoxon Rank-Sum test, with the null hypothesis stated as:
+
+\begin{quote}
+  \textbf{Null Hypothesis 2:} \textit{The probability that a Democratic voter experienced more difficulty voting than a Republican voter is equal to the probability that a Republican voter experienced more difficulty voting than a Democratic voter}
+\end{quote}
 
 # Analysis & Results
 
-*Ranked voting difficulty* 
-
+*Ranked voting difficulty*  \newline
 Our analysis begins with an examination of the voting difficulty index across all registered voters surveyed. We test the difference, if any, between the level of difficulty encountered by Republican- and Democrat-identified voters:
 
 ```{r echo=TRUE,results='hide',warning=FALSE}
@@ -243,8 +252,7 @@ t.test(diff_ranked~party,data = data_fin_reduced)
 
 The result of this test provides no evidence that there is a significant difference in reported experience of voting difficulty based on political identification (t=1.2604,p=0.2076). This is unsurprising, as discussed previously; Democrats reported a mean level of voting difficulty of 1.176151, while Republicans reported a mean of 1.157778 (1 = "Not difficult at all"). That is, voters of both parties collectively experienced, on average, very little to no difficulty; in fact, `r round((1-count(data_fin_difficulty)/count(data_fin_reduced))*100,2)`% of voters reported no difficulty at all (Appendix: Table 1). We note again that the tested variable also does not incorporate the experience of those who were not able to cast a vote after experiencing difficulty, as these voters did not provide a ranked difficulty survey response. 
 
-*Categorical voting difficulty and voting status*
-
+*Categorical voting difficulty and voting status* \newline
 Therefore, we focus our analysis on only that subset of attempted voters who experienced difficulty in order to detect any difference the experience of difficulty for Republicans and Democrats. To do so, we test our secondary variable categorizing voters by their report of having or not having difficulty and voting status in categories 2 (difficulty; voted) and 3 (difficulty; didn't vote).
 
 ```{r echo=TRUE,results='hide',warning=FALSE}
@@ -271,8 +279,8 @@ party_summary_table <- data_fin_reduced %>%
       party == "D" ~ 'Democrat', 
       party == "R" ~ 'Republican'), 
   difficulty = case_when(
-      diff_categorical > 1 ~ 'Reported difficulty', 
-      diff_categorical == 1 ~ 'Did not report difficulty')) %$% 
+      diff_categorical > 1 ~ 'Difficulty', 
+      diff_categorical == 1 ~ 'No difficulty')) %$% 
   prop.table(
     table(
       party, 
@@ -284,8 +292,8 @@ voted_summary_table <- data_fin_reduced %>%
       diff_categorical < 3 ~ 'Voted', 
       diff_categorical == 3 ~ 'Didn\'t Vote'), 
     difficulty = case_when(
-      diff_categorical > 1 ~ 'Reported difficulty', 
-      diff_categorical == 1 ~ 'Did not report difficulty')) %$% 
+      diff_categorical > 1 ~ 'Difficulty', 
+      diff_categorical == 1 ~ 'No difficulty')) %$% 
   prop.table(
     table(
       vote_status, 
