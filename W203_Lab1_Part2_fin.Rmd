@@ -1,7 +1,7 @@
 ---
 title: "Influence of Party Affiliation on Reported Voting Difficulty"
 author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
-date: "2/29/2022"
+date: "3/3/2022"
 output:
   pdf_document:
     toc: true
@@ -300,39 +300,36 @@ voted_summary_table <- data_fin_reduced %>%
       difficulty))
 ```
 
-```{r summary-table}
+```{r party-table}
 kable(
   party_summary_table,
   digits = 3,
   caption = 'Self-Reported Difficulty and Party', 
-  booktabs = TRUE, 
-  position = "float_left"
+  booktabs = TRUE
 )
+```
+
+```{r voted-table}
 kable(
   voted_summary_table,
   digits = 3,
   caption = 'Self-Reported Difficulty and Voting Ability', 
-  booktabs = TRUE, 
-  position = "float_right"
+  booktabs = TRUE
 )
 ```
 
-```{r plot diff_ranked, echo=FALSE,warning=FALSE}
+```{r plot diff_ranked, echo=FALSE,warning=FALSE,fig.show="hold", out.width="50%",fig.height = 4}
 # diff_ranked distribution for Democrats
-gghistogram(sub_dem$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Figure 1: Difficulty Ranking of Voters Who Voted, Democrats')
-```
-\newline
-```{r echo=FALSE,warning=FALSE}
+gghistogram(sub_dem$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Figure 1: Difficulty Ranking, Voters Who Voted, Democrats')+ylim(0,3000)
+
 # diff_ranked distribution for Republicans
-gghistogram(sub_rep$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Figure 2: Difficulty Ranking of Voters Who Voted, Republicans')
+gghistogram(sub_rep$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Figure 2: Difficulty Ranking, Voters Who Voted, Republicans')+ylim(0,3000)
 ```
 \newline
-```{r echo=FALSE,warning=FALSE}
+```{r echo=FALSE,warning=FALSE,fig.show="hold", out.width="50%",fig.height = 4}
 # diff_categorical distribution for Democrats
-gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Figure 3: Difficulty Categories, Democrat Voters')
-```
-\newline
-```{r echo=FALSE,warning=FALSE}
+gghistogram(sub_dem$diff_categorical, height=4,bins = 3, fill= 'steelblue', xlab='', main = 'Figure 3: Difficulty Categories, Democrat Voters')+ylim(0,3000)
+
 # diff_categorical distribution for Republicans
-gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Figure 4: Difficulty Categories, Republican')
+gghistogram(sub_dem$diff_categorical, height=10,bins = 3, fill= 'steelblue', xlab='', main = 'Figure 4: Difficulty Categories, Republican')+ylim(0,3000)
 ```
