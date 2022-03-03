@@ -61,22 +61,14 @@ This question has the potential to illuminate important aspects of the debate ab
 
 # Data and Methodology
 
-This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a representitive sample of voters from both before and after the 2020 election. 
+This study uses data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a random sample of US Citizens from both before and after the 2020 election. The full dataset includes 8,280 observations. Our study focuses only on "voters" who are categorized as either Democrats or Republicans. We operationalize the concept of a "voter" and define party affiliation as follows:
 
-In order to answer the research question, three conceptualization questions need to be answered:
-1. Who or what is a **voter**?
-2. Who is a Republican and who is a Democrat; i.e. How do we define **party affiliation**?
-3. What is **difficulty in voting**?
+We consider a *"voter"* to be anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters." 
 
-For this study, the below definitions and assumptions have been applied:
+In order to determine *party affiliation,* we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. After dropping the 719 individuals who self-identified as Independent and the 18 people who did not provide a party affiliation, we are left with a total of 6316 observations.
 
-*Voter*
-We define a "voter" as anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters."
-
-*Party Affiliation*
-In order to determine party affiliation, we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. The 719 individuals who self-identified as Independents with no party lean are classified as Independents; they remain in our sample for exploration purposes, but the difficulty analysis focuses only on Democrats and Republicans. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. 
-
-*Difficulty in Voting*
+We next operationalize the concept of *"difficulty in voting."*
+*STOPPED HERE. EVERYTHING BELOW HERE IN THiS SECTION SHOULD BE REWRITTEN TO REFLECT OUR UPDATED DIFF VARIABLES AND ANALYSIS* 
 Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. We have different information available for these two groups.
 
 For **respondents who voted,** the ANES survey specifically asks whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty, if they encountered multiple. For the respondents who voted, the survey also asked directly how much difficulty they encountered, if any (e.g. none, little, moderate, extreme). For **people who did not vote,** the ANES survey asked for the main reason they did not vote, and respondents could choose only one form of difficulty.  
