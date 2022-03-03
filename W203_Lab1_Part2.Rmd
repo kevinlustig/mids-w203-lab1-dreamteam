@@ -47,7 +47,7 @@ data_fin_difficulty = data_fin_reduced %>% filter(diff_subj2 > 1)
 
 ```
 
-# Importance and Context
+# Importance and Context [This needs to be cut down; claims about a certain party claiming vting is harder for their voters needs to be backed up by]
 
 The topic of obstacles to voting has been the focus of considerable discussion in the United States in recent years, including notably before, during, and since the 2020 federal election. The debate over the facility with which Americans are able to vote has elicited claims both that voting in practice is too restrictive and challenging to allow for participation by all would-be voters and contrarily that it is so open and unrestricted that fraudulent voting can and does occur with limited recourse. Perhaps unsurprisingly, these assertions have largely arisen along partisan lines, and have been used as evidence in support of (often contradictory) changes to voting laws by elected officials and their supporters in both major political parties. Those affiliated with the Democratic Party are more likely to feel that it is too difficult to vote and support efforts to increase access to the polls, while Republican Party supporters are more likely to support restrictions on voting access. Naturally, the partisan nature of this debate means that voting behavior itself has been impacted, for example with Democratic voters significantly more likely to vote early and by mail than Republican voters in 2020, both methods widely discussed as fraught with error and likely to be fraudulent by prominent members of the Republican party. 
 
@@ -58,6 +58,44 @@ Naturally, this raises the question of whether the actual experience of difficul
 This question has the potential to illuminate important aspects of the debate on measures to change voting laws. Namely, is it possible that Democrat-associated policies to ease voting regulations are based on an actual increased level of difficulty voting for Democrats as compared to Republicans (and likewise for Republican efforts to further restrict voting?) What is the scale of the actual voting difficulty for members of each party, and who would be most affected and in what way by changes meant to address the current ease or difficulty of voting? 
 
 # Data and Methodology
+
+This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a representitive sample of voters from both before and after the 2020 election. 
+
+In order to answer the research question *Did Democrats or Republicans have more difficulty voting in the 2020 election?*, three conceptualization questions need to be answered:
+1. Who or what is a **voter**?
+2. Who is a Republican and who is a Democrat; i.e. How do we define **party affiliation**?
+3. What is **difficulty in voting**?
+
+For this study, the below definitions and assumptions have been applied:
+
+*Voter*
+We define a "voter" as anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters."
+
+*Party Affiliation*
+In order to determine party affiliation, we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. The 719 individuals who self-identified as Independents with no party lean are classified as Independents; they remain in our sample for exploration purposes, but the difficulty analysis focuses only on Democrats and Republicans. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. 
+
+*Difficulty in Voting*
+Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. We have different information available for these two groups.
+
+For **respondents who voted,** the ANES survey specifically asks whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty, if they encountered multiple. For the respondents who voted, the survey also asked directly how much difficulty they encountered, if any (e.g. none, little, moderate, extreme). For **people who did not vote,** the ANES survey asked for the main reason they did not vote, and respondents could choose only one form of difficulty.  
+
+1. **Difficulty Index:** This is a synthetic index that was created to measure how many different types of obstacles registered voters faced in trying to vote. We assume a) that having at least one reported type of difficulty (rather than none) is a valid measure of whether somebody experienced any difficulty and b) that reporting a greater number of types of difficulty implies that somebody had more difficulty. This assumption is based on the premise that if each obstacle is equally challenging, then facing a greater number of obstacles implies that one faced an overall greater challenge when trying to vote.  
+
+To generate the difficulty index for **people who voted,** the research team created separate binary variables for each type of difficulty: registration issues, not having the correct form of ID, difficulties in receiving absentee ballots, confusion about the ballot or machine, difficulties in getting to the polling place (i.e. transportation issues), long wait times, difficulties with work schedules, bad weather, issues mailing ballots, and other. After creating the binary variables, the sum of them all was taken to create the difficulty index for each voter. There were no weights applied to this index because based on the data given, there was no way to perceive qualitative differences between types of difficulty.
+
+To generate an index for **people who did not vote,** the research team followed a similar approach: we generated a binary variable for each form of difficulty listed under the "main reason you did not vote" and checked the sum of all these variables for each respondent (although it is important to note that the maximum index value for this group is 1, because they only selected one main reason). The reasons for not voting that we considered forms of difficulty were: lacking the correct form of ID, being sick or disabled, bad weather, transportation, long lines, not allowed to vote at the polls, requested but did not receive absentee ballot, did not know where to vote, and other. We excluded reasons for not voting that were not due to difficulty (e.g. "Out of town"). 
+
+
+2. **Ordinal Difficulty Variable:**
+
+Since the maximum possible index value for non-voters is 1 (they could only report one reason), the index value has a few shortcomings: first, the maximum value is not the same for voters versus nonvoters, which makes it hard to compare levels of difficulty across these two groups (although this is somewhat mitigated by the fact that nearly 80% of people who voted and reported any type of difficulty only reported one type). The second challenge with the index is that it does not account for the fact that non-voters were presumably the *most* impacted by the experience of difficulty - so much so that they did not complete the voting process. 
+
+Therefore, we created an additional difficulty variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote. A registered voter who did not vote is considered to have faced difficulty if they reported a difficulty-related reason for not voting (we use the same reasons as we did when creating the index). A registered voter who did vote is considered to have faced difficulty if they responded to the question of "how difficult was it to vote" by choosing "a little difficult," "moderately difficult," "very difficult," or "extremely difficult." Note that we do not differentiate here between scales of difficulty, in part because there is no objective way to numerically define the distance between each level of difficulty on the Likert scale.
+
+This variable has three categories: 
+*Category 1:* Those who did not experience difficulty (regardless of whether they voted). 
+*Category 2:* Those who experienced difficulty and did vote. 
+*Category 3:* Those who experienced difficulty and did not vote. 
 
 ```{r plot diff_index, echo=FALSE}
 # diff_index distribution for Democrats
@@ -77,43 +115,6 @@ gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not
 gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Republicans')
 
 ```
-This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a representitive sample of voters from both before and after the 2020 election. 
-
-In order to answer the research question *Did Democrats or Republicans have more difficulty voting in the 2020 election?*, three conceptualization questions need to be answered:
-1. Who or what is a **voter**?
-2. Who is a Republican and who is a Democrat; i.e. How do we define **party affiliation**?
-3. What is **difficulty in voting**?
-
-For this study, the below definitions and assumptions have been applied:
-
-*Voter*
-We define a "voter" as anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters."
-
-*Party Affiliation*
-In order to determine party affiliation, we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. The 719 individuals who self-identified as Independents with no party lean are classified as Independents; they remain in our sample for exploration purposes, but the difficulty analysis focuses only on Democrats and Republicans. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. 
-
-*Difficulty in Voting*
-Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. We have different information available for these two groups.
-
-For **people who voted,** the ANES survey specifically whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty, if they encountered multiple. For the group who voted, the survey also asked directly how much difficulty they encountered, if any. For **people who did not vote,** the ANES survey asked for the main reason they did not vote, and respondents could choose one form of difficulty.  
-
-1. **Difficulty Index:** This is a synthetic index that was created to measure how many different types of obstacles registered voters faced in trying to vote. We assume a) that having at least one reported type of difficulty (rather than none) is a valid measure of whether somebody experienced any difficulty and b) that reporting a greater number of types of difficulty implies that somebody had more difficulty. This assumption is based on the premise that if each obstacle is equally challenging, then facing a greater number of obstacles implies that one faced an overall greater challenge when trying to vote.  
-
-To generate the difficulty index for **people who voted,** the research team created separate binary variables for each type of difficulty: registration issues, not having the correct form of ID, difficulties in receiving absentee ballots, confusion about the ballot or machine, difficulties in getting to the polling place (i.e. transportation issues), long wait times, difficulties with work schedules, bad weather, issues mailing ballots, and other. After creating the binary variables, the sum of them all was taken to create the difficulty index for each voter. There were no weights applied to this index because based on the data given, there was no way to perceive qualitative differences between types of difficulty.
-
-To generate an index for **people who did not vote,** the research team followed a similar approach: we generated a binary variable for each form of difficulty listed under the "main reason you did not vote" and checked the sum of all these variables for each respondent (although it is important to note that the maximum index value for this group is 1, because they only selected one main reason). The reasons for not voting that we considered forms of difficulty were: lacking the correct form of ID, being sick or disabled, bad weather, transportation, long lines, not allowed to vote at the polls, requested but did not receive absentee ballot, did not know where to vote, and other. We excluded reasons for not voting that were not due to difficulty (e.g. "Out of town"). 
-
-
-2. **Ordinal Difficulty Variable:**
-
-Since the maximum possible index value for non-voters is 1 (they could only report one reason), the index value has a few shortcomings: first, the maximum value is not the same for voters versus nonvoters, which makes it hard to compare levels of difficulty across these two groups (although this is somewhat mitigated by the fact that nearly 80% of people who voted and reported any type of difficulty only reported one type). The second challenge with the index is that it does not account for the fact that non-voters were presumably the *most* impacted by the experience of difficulty - so much so that they did not complete the voting process. 
-
-Therefore, we created an additional difficulty variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote. A registered voter who did not vote is considered to have faced difficulty if they reported a difficulty-related reason for not voting (we use the same reasons as we did when creating the index). A registered voter who did vote is considered to have faced difficulty if they responded to the question of "how difficult was it to vote" by choosing "a little difficult," "moderately difficult," "very difficult," or "extremely difficult." Note that we do not differentiate here between scales of difficulty, in part because there is no objective way to numerically define the distance between each level of difficulty on the Likert scale.
-
-This variable has three categories: 
-*Category 1:* Those who did not experience difficulty (regardless of whether they voted). 
-*Category 2:* Those who experienced difficulty and did vote. 
-*Category 3:* Those who experienced difficulty and did not vote. 
 
 
 # Analysis & Results
