@@ -77,7 +77,7 @@ gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not
 gghistogram(sub_dem$diff_subj2, bins = 3, fill= 'steelblue', xlab = 'Had/did not have difficulty voting', main = 'Self-Reported Difficulty: Republicans')
 
 ```
-This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a representitive sample of voters from both before and after the 2020 election.  *Need to add anything more in here? like sampling/representation maybe?? pre and post voting?? also maybe something on using only post interview people? there was some filter applied no? ....Rebecca note: added another clause to try to address this*
+This study will use data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a representitive sample of voters from both before and after the 2020 election. 
 
 In order to answer the research question *Did Democrats or Republicans have more difficulty voting in the 2020 election?*, three conceptualization questions need to be answered:
 1. Who or what is a **voter**?
@@ -93,31 +93,39 @@ We define a "voter" as anyone in the ANES survey sample who registered to vote -
 In order to determine party affiliation, we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. The 719 individuals who self-identified as Independents with no party lean are classified as Independents; they remain in our sample for exploration purposes, but the difficulty analysis focuses only on Democrats and Republicans. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. 
 
 *Difficulty in Voting*
-Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The ANES dataset had variables which specifically asked those who had voted whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc.) and how difficult voters found it to vote. The dataset also included variables asking how voters (who voted) voted (in person or via absentee ballot) and reasons as to why people did not vote. After much review and reflection, the researchers decided on two variables to measure difficulty in voting: 
-1. **Difficulty Index:** This is a synthetic index that was created to showcase the extent of how many different types of obstacles voters faced in trying to vote. It is based off of the group of variables asking respondents who voted whether they encountered a specific type of obstacle, and the main reason a respondent did not vote.  
+Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. We have different information available for these two groups.
 
-Of the voters who voted AND indicated facing any sort of difficulty, 79.9% (**how to source the code i did here?**) indicated facing only one difficulty, giving the notion that the majority of voters likely experienced one main difficulty. As such the researchers felt comfortable enough to make the assumption that for the respondents who did not vote, the main reason they did not vote was likely the main relevant difficulty they faced which deterred them from being able to cast their vote. This assumption allowed the research team to use the "main reason respondent did not vote" variable to account for the difficulties faced by registered voters who did not end up voting. 
+For **people who voted,** the ANES survey specifically whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty, if they encountered multiple. For the group who voted, the survey also asked directly how much difficulty they encountered, if any. For **people who did not vote,** the ANES survey asked for the main reason they did not vote, and respondents could choose one form of difficulty.  
 
-In the variable outlining why respondents did not vote, most of the answer choices aligned with the options presented to those who did vote. Some types of difficulty were relevant to only those who voted or those who did not end up voting. To create the difficulty index, the research team created separate binary variables for each type of difficulty: registration issues, not having the correct form of ID, difficulties in receiving absentee ballots, confusion about the ballot or machine, difficulties in getting to the polling place (i.e. transportation issues), long wait times, difficulties with work schedules, bad weather, issues mailing ballots, being sick or disabled, not allowed to vote at the polls after trying, not knowing where to vote, and other. 
+1. **Difficulty Index:** This is a synthetic index that was created to measure how many different types of obstacles registered voters faced in trying to vote. We assume a) that having at least one reported type of difficulty (rather than none) is a valid measure of whether somebody experienced any difficulty and b) that reporting a greater number of types of difficulty implies that somebody had more difficulty. This assumption is based on the premise that if each obstacle is equally challenging, then facing a greater number of obstacles implies that one faced an overall greater challenge when trying to vote.  
 
-After creating the binary variables, the sum of them all was taken to create the difficulty index for each voter. There were no weights applied to this index because based on the data given in the dataset, there was no way to perceive which difficulty was worse than others - especially given that certain difficulties may have been more or less impactful for certain voters given their specific context. As such, this index is more to highlight the magnitude of the different types of difficulties voters faced. 
+To generate the difficulty index for **people who voted,** the research team created separate binary variables for each type of difficulty: registration issues, not having the correct form of ID, difficulties in receiving absentee ballots, confusion about the ballot or machine, difficulties in getting to the polling place (i.e. transportation issues), long wait times, difficulties with work schedules, bad weather, issues mailing ballots, and other. After creating the binary variables, the sum of them all was taken to create the difficulty index for each voter. There were no weights applied to this index because based on the data given, there was no way to perceive qualitative differences between types of difficulty.
 
-2. **Subjective difficulty:** Since the difficulty index is not able to account for how much difficulty each voter encountered, regardless of the difficulty type, the research team also developed a subjective difficulty variable. 
-
-The dataset had a variable in which the levels of difficulties (such as moderate or extreme) of those who did vote in the 2020 election were recorded. No such variable was recorded for those who did not vote, but based on *ANNIE TO FINISH BASED ON WHAT IS DECIDED REGARDING WHICH SUBJECTIVE DIFFICULTY VARIABLE TO USE*
+To generate an index for **people who did not vote,** the research team followed a similar approach: we generated a binary variable for each form of difficulty listed under the "main reason you did not vote" and checked the sum of all these variables for each respondent (although it is important to note that the maximum index value for this group is 1, because they only selected one main reason). The reasons for not voting that we considered forms of difficulty were: lacking the correct form of ID, being sick or disabled, bad weather, transportation, long lines, not allowed to vote at the polls, requested but did not receive absentee ballot, did not know where to vote, and other. We excluded reasons for not voting that were not due to difficulty (e.g. "Out of town"). 
 
 
-# Results
+2. **Ordinal Difficulty Variable:**
 
-Our analysis begins with an examination of self-reported difficulty voting across all voters surveyed. We test the difference, if any, between the number of reported types of difficulty encountered by Republican- and Democrat-identified voters:
+Since the maximum possible index value for non-voters is 1 (they could only report one reason), the index value has a few shortcomings: first, the maximum value is not the same for voters versus nonvoters, which makes it hard to compare levels of difficulty across these two groups (although this is somewhat mitigated by the fact that nearly 80% of people who voted and reported any type of difficulty only reported one type). The second challenge with the index is that it does not account for the fact that non-voters were presumably the *most* impacted by the experience of difficulty - so much so that they did not complete the voting process. 
+
+Therefore, we created an additional difficulty variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote. A registered voter who did not vote is considered to have faced difficulty if they reported a difficulty-related reason for not voting (we use the same reasons as we did when creating the index). A registered voter who did vote is considered to have faced difficulty if they responded to the question of "how difficult was it to vote" by choosing "a little difficult," "moderately difficult," "very difficult," or "extremely difficult." Note that we do not differentiate here between scales of difficulty, in part because there is no objective way to numerically define the distance between each level of difficulty on the Likert scale.
+
+This variable has three categories: 
+*Category 1:* Those who did not experience difficulty (regardless of whether they voted). 
+*Category 2:* Those who experienced difficulty and did vote. 
+*Category 3:* Those who experienced difficulty and did not vote. 
+
+
+# Analysis & Results
+
+*Test 1* 
+Our analysis begins with an examination of the voter-difficulty index across all registered voters surveyed. We test the difference, if any, between the number of reported types of difficulty encountered by Republican- and Democrat-identified voters:
 
 ```{r echo=TRUE}
-t.test(diff_index~party,alternative = "two.sided",data = data_fin_reduced )
+t.test(diff_index~party,alternative = "two.sided",data = data_fin_reduced)
 ```
 
-The result of this test provides no evidence that there is a significant difference in reported experience of voting difficulty based on political identification (t=1.2208,p=0.2222). This is unsurprising because Democrats reported a mean experience of .2807 types of voting difficulty, while Republicans reported a mean of .2628 types That is, voters of both parties collectively experienced, on average, far less than even one incident of difficulty; in fact, `r round((1-count(data_fin_difficulty)/count(data_fin_reduced))*100,2)`% of voters self-reported no difficulty at all (Table 1). 
-
-Importantly, the variable tested (number of types of difficulty experienced) does not accurately reflect the situation of voters who were unable to vote due to difficulty because of differences in the survey approach for these voters, as previously discussed. However, this group is of particular interest to our study as the ultimate concern with difficulty voting is that it may prevent eligible voters from casting a ballot. Therefore, we consider those voters who attempted to vote and did not due to difficulty as the *most severely* impacted by voting obstacles. 
+The result of this test provides no evidence that there is a significant difference in reported experience of voting difficulty based on political identification (t=1.2208,p=0.2222). This is unsurprising because Democrats reported a mean experience of .2807 types of voting difficulty, while Republicans reported a mean of .2628 types That is, voters of both parties collectively experienced, on average, far less than even one incident of difficulty; in fact, our ordinal variable makes it easy to see that `r round((1-count(data_fin_difficulty)/count(data_fin_reduced))*100,2)`% of voters reported no difficulty at all (Table 1). 
 
 ```{r make summary table} 
 party_summary_table <- data_fin_reduced %>% 
@@ -164,9 +172,8 @@ kable(
 )
 ```
 
-Consequently, we further analyze an additional variable which describes registered voters ordinally based both on whether they experienced difficulty and whether they were able to cast a vote (Table 2). We then reduce this group to just those who experienced difficulty by excluding those who did not self-report difficulty (Category 1); this group represents a small subset (n=`r count(data_fin_difficulty)`) of the overall Democrat- and Republican-identified surveyed population (n=`r count(data_fin_reduced)`). Nevertheless, it allows us to focus our analysis on the distribution of voters who encountered voting difficulty and were (Category 2) or were not (Category 3) subsequently able to vote.
-
-Using this variable, we test whether there are differences by party in the ability to complete the process of casting a vote among those who experienced difficulty:
+*Test 2*
+Using the ordinal difficulty variable, we test whether there are differences by party in the ability to complete the process of casting a vote among those who experienced difficulty (people in categories 2 and 3). In other words, we are defining "not voting due to difficulty" as a more severe form of difficulty than "facing difficulty but still managing to vote," and checking whether Republicans or Democrats fall closer to category 3 - the most severe case.
 
 ```{r echo=TRUE}
 wilcox.test(diff_subj2~party,alternative = "two.sided",data = data_fin_difficulty, conf.int=TRUE )
@@ -178,10 +185,9 @@ It is important to note some key limitations of this approach. Factors that are 
 
 # Discussion
 
-Our analysis finds, first, that the reported incidence of voting difficulty is quite low for all voters. Our analysis using the difficulty index showed no significant difference in difficulty between Republican and Democrat voters; this is likely at least in party due to the fact that neither party experienced much difficulty voting. However, in examining the subset of voters who did self-report difficulty, we propose that it is meaningful to know how many were not able to ultimately cast a ballot due to that difficulty. With regard to this measurement, we do find that Democrats who experienced difficulty at the polls were slightly but significantly more likely to be unable to vote than Republicans. 
+Our analysis finds, first, that the reported incidence of voting difficulty is quite low for all voters. Our analysis using the difficulty index showed no significant difference in difficulty between Republican and Democrat voters; this is likely at least in part due to the fact that neither party experienced much difficulty voting. However, in examining the subset of voters who did self-report difficulty, we propose that it is meaningful to know how many were not able to ultimately cast a ballot due to that difficulty. With regard to this measurement, we do find that Democrats who experienced difficulty at the polls were slightly but significantly more likely to be unable to vote than Republicans. 
 
 This study suggests a number of interesting questions that merit further research. Are there significant differences in the kind or amount of difficulty faced by just those voters who did experience difficulty? Do Democrat and Republican voters report or experience different kinds of difficulty at different rates? Does the incidence of difficulty voting change from election to election? We believe our results are most interesting in the context of these and other answers in helping to form an evidence base for ongoing debates about voting access. The right mix of policy solutions for changing (or preserving) current voting practices depends on an understanding of the real ease or difficulty of voting, and particularly whether some groups find voting to be more or less accessible to them than other groups do. We hope that our findings can help to point the way toward additional answers that will contribute to effective and evidence-based policy-making that ensures fair access to the polls for all voters with a minimum of obstacles. 
-
 
 
 ### Working code
@@ -247,6 +253,7 @@ var.test(diff_index~party, data = data_fin_reduced)
 ```{r echo=FALSE}
 t.test(diff_index~party,alternative = "two.sided", paired = FALSE, conf.int = TRUE, data = data_fin_reduced )
 ```
+
 
 ## Considering diff_subj
 

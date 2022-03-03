@@ -228,7 +228,8 @@ data <- data %>% mutate(
       difficulty_didnt_vote_reason_V202123 == 11 |
       difficulty_didnt_vote_reason_V202123 == 12 |
       difficulty_didnt_vote_reason_V202123 == 13 |
-      difficulty_didnt_vote_reason_V202123 == 14 ~ 3,
+      difficulty_didnt_vote_reason_V202123 == 14 |
+      difficulty_didnt_vote_reason_V202123 == 16  ~ 3,
     difficulty_how_difficult_V202119 >= 2 ~ 2,
     TRUE ~ 1
   )
