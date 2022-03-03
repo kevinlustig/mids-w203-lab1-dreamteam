@@ -4,14 +4,20 @@ author: "Kevin Lustig, Rebecca Nissan, Anuradha Passan, Giorgio Soggiu"
 date: "3/1/2022"
 output:
   pdf_document:
-    toc: yes
-    number_sections: yes
-    toc_depth: 3
-  word_document:
-    toc: yes
-    toc_depth: '3'
+    toc: true
+    number_sections: true
+urlcolor: blue
 ---
 ```{r packages install, include=FALSE}
+##Install packages if not loaded
+# install.packages("dplyr")
+# install.packages("stringr")
+# install.packages("tidyverse")
+# install.packages("scales")
+# install.packages("readxl")
+# install.packages("rstatix")
+# install.packages("ggpubr")
+# install.packages("tinytex")
 
 library(dplyr)
 library(stringr)
@@ -66,7 +72,7 @@ It is this last point on directionality that suggests an alternative approach to
 ## Test Assumptions
 
 ### World Happiness 
-*Scenario:* We have two variables: Life.Ladder and Log.GDP.per.Capita, and we want to see whether people in countries with high GDP per capita are more or less happy than people in countries with low GDP per capita.
+*Scenario:* Investigate whether people from countries with low GDP per capita or high GDP per capita are more or less happy according to the Life Ladder score. 
 
 *Proposed test:* Two Sample t-Test
 
@@ -75,8 +81,7 @@ It is this last point on directionality that suggests an alternative approach to
 2. Random variables are independent and identically distributed (hereby referred to as i.i.d.)\newline
 3. Normality of random variables\newline
 
-The "Life Ladder" score (LLS) variable is composed of continuous values. Data can be classified and the distances between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables.
-The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.
+The "Life Ladder" score (LLS) variable is composed of continuous values. Data can be classified and the distances between values make sense. This point is important considering that the Two-Sample t-Test aims at comparing means of two random variables. The LLS seems to correspond to a metric variable which satisfies the first assumption. 
 
 Assuming that data collection and transformation protocols were followed in similar fashion throughout the data collection and transformation activities, it can be assumed that the random variables are independent and identically distributed. 
 ```{r, include=FALSE}
@@ -86,7 +91,7 @@ wh_data <- read.csv('datasets/happiness_WHR.csv')
 # Select necessary variables 
 wh_data <- wh_data %>% select(Life.Ladder, Log.GDP.per.capita)
 ```
-Now moving on to investigating normality. A quick summary below of both "Life.Ladder" and "Log.GDP.per.capita" variables reveals that "Log.GDP.per.capita" contains 13 Na(s) values. These will be omitted for the rest of this investigation. Additionally, the summary below reveals the mean GDP per capita which will be used as the point to separate low and high GDP per capita countries. 
+Moving on to investigating normality. A quick summary below of both the LLS and log GDP per capita variables reveal that log GDP per capita contains 13 Na(s) values. These observations will be omitted for the rest of this investigation, as it is the log GDP per capita that determines which group the LLS score will go to. Additionally, the summary below reveals the mean GDP per capita which will be used as the point to separate low and high GDP per capita countries. 
 
 **Summary: Life Ladder Score and GDP per Capita**
 ```{r, echo=FALSE, comment=""}
@@ -112,7 +117,7 @@ summary(high_gdp_cap$Life.Ladder)
 low_gdp_cap <- wh_data %>% filter(Log.GDP.per.capita < gdp_capita_mean)
 summary(low_gdp_cap$Life.Ladder)
 ```
-A quick glance gives the impression that the LLS for both low and high GDP per capita countries may be skewed a bit to the left. This can be confirmed by looking at a visualization of the distribution via histograms (done below). The x-axis displays the Life Ladder Scores and the y-axis the frequency of each Life Ladder Score values. 
+A quick glance gives the impression that the LLS for both low and high GDP per capita countries may be skewed a bit to the left. This can be confirmed by looking at a visualization of the distribution via histograms (done below). 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 # Observe the histograms of both variables 
 gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
@@ -122,10 +127,7 @@ gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life
 #hist($) #fix #make pretty 
 gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
-The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. Considering the samples size, another approach can be taken:
-
-The Central Limit Theorem (CLT) states that the distribution of a standardize sample mean converge to a normal curve distribution as the sample size tends to infinity. The CLT requires that data are IID and the population has finite variance. The first statement has already been verified. The finite variance one can be visually assessed via the samples distributions. 
-As the Samples distributions are not heavy tailed distributions, we can assume (with caution) that each population has a positive variance. In that context, the CLT seems applicable.
+The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. Considering that the sample size for LLS from high GDP per capita countries is n=122 and for low GDP per capita countries is n=104, the central limit theorem (CLT) can be applied here. The CLT states that the distribution of the sample means converge to a normal distribution as the sample size gets larger. In this context, the CLT seems to be applicable, and thus helps satisfy the normality condition. 
 
 **Conduct the test?**\newline
 Given that the assumptions are satisfied including the normality assumption, the t-test is applicable.
@@ -247,7 +249,7 @@ boxplot( wine_data$difference, data = wine_data,
 The distribution of the difference between the paired samples  "heart" and "liver" is a bit left skewed. Moreover this distribution does not seem to be symmetric around the median. However, one should not expect the differences in distribution to be perfectly symmetric especially when the sample size is small (n=21). Thus, the assumption of symmetry is difficult to assess here but could be considered as verified.
 
 **Conduct the test?**\newline
-The Wilcoxon Signed Rank Test can be applied in that context, with some caution. 
+The Wilcoxon Signed Rank Test can be applied in that context, but with caution. 
 
 ### Attitudes Toward the Religion 
 
@@ -293,7 +295,7 @@ diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
 gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 9, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
 
-The differences histogram looks symmetrical, not necessarily normal but not heavy-tailed. Considering the large sample size (superior than 800 observations) and the non heavy-tailed behavior (with caution) of the difference distribution, the Central Limit Theorem (CLT) seems applicable. The CLT states that a standardize sample mean distribution converges to a normal curve as n (the sample size) tends to infinity. In this context, the application of the CLT suggests that the normality assumption is satisfied.
+The differences histogram looks symmetrical, not necessarily normal but not heavy-tailed. Considering the large sample size (n=802) and the non heavy-tailed behavior (with caution) of the difference distribution, the Central Limit Theorem (CLT) seems applicable. The CLT states that a standardize sample mean distribution converges to a normal curve as n (the sample size) tends to infinity. In this context, the application of the CLT suggests that the normality assumption is satisfied.
 
 **Conduct the test?** 
 \newline
