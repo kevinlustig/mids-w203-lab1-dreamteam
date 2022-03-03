@@ -206,52 +206,67 @@ data <- data %>% mutate(
   # and only difficult or not for people who didn't vote, this will be 
   # a binary variable on whether there was any medium level or more of 
   # difficulty  to max where they didn't vote
-  diff_subj = case_when(
+  #diff_subj = case_when(
+  #  difficulty_didnt_vote_reason_V202123 == 6 | 
+  #    difficulty_didnt_vote_reason_V202123 == 8 |
+  #    difficulty_didnt_vote_reason_V202123 == 9 |
+  #    difficulty_didnt_vote_reason_V202123 == 10 |
+  #   difficulty_didnt_vote_reason_V202123 == 11 |
+  #    difficulty_didnt_vote_reason_V202123 == 12 |
+  #    difficulty_didnt_vote_reason_V202123 == 13 |
+  #    difficulty_didnt_vote_reason_V202123 == 14 | 
+  #    difficulty_how_difficult_V202119 == 3 |
+  #    difficulty_how_difficult_V202119 == 4 |
+  #    difficulty_how_difficult_V202119 == 5 ~ 1,
+  #  TRUE ~ 0
+  #), 
+  # Here we group voters into three categories
+  # Category 1: Voted and did not experience difficulty
+  # Category 2: Voted and experienced difficulty
+  # Category 3: Did not vote and experienced difficulty 
+  #   (not all responses to "What was the reason you didn't vote?" 
+  #   can be classified as "difficulty", so we select the relevant cases here)
+  # NOTE: This implies a category of voters who did not vote 
+  #   and did not experience difficulty (Category 0 perhaps)
+  #   but we filter these voters out earlier in the process
+  #   as non-voters
+  diff_categorical = case_when(
     difficulty_didnt_vote_reason_V202123 == 6 | 
-      difficulty_didnt_vote_reason_V202123 == 8 |
-      difficulty_didnt_vote_reason_V202123 == 9 |
-      difficulty_didnt_vote_reason_V202123 == 10 |
-      difficulty_didnt_vote_reason_V202123 == 11 |
-      difficulty_didnt_vote_reason_V202123 == 12 |
-      difficulty_didnt_vote_reason_V202123 == 13 |
-      difficulty_didnt_vote_reason_V202123 == 14 | 
-      difficulty_how_difficult_V202119 == 3 |
-      difficulty_how_difficult_V202119 == 4 |
-      difficulty_how_difficult_V202119 == 5 ~ 1,
-    TRUE ~ 0
-  ), 
-  diff_subj2 = case_when(
-    difficulty_didnt_vote_reason_V202123 == 6 | 
-      difficulty_didnt_vote_reason_V202123 == 8 |
-      difficulty_didnt_vote_reason_V202123 == 9 |
-      difficulty_didnt_vote_reason_V202123 == 10 |
-      difficulty_didnt_vote_reason_V202123 == 11 |
-      difficulty_didnt_vote_reason_V202123 == 12 |
-      difficulty_didnt_vote_reason_V202123 == 13 |
-      difficulty_didnt_vote_reason_V202123 == 14 |
-      difficulty_didnt_vote_reason_V202123 == 16  ~ 3,
+    difficulty_didnt_vote_reason_V202123 == 8 |
+    difficulty_didnt_vote_reason_V202123 == 9 |
+    difficulty_didnt_vote_reason_V202123 == 10 |
+    difficulty_didnt_vote_reason_V202123 == 11 |
+    difficulty_didnt_vote_reason_V202123 == 12 |
+    difficulty_didnt_vote_reason_V202123 == 13 |
+    difficulty_didnt_vote_reason_V202123 == 14 |
+    difficulty_didnt_vote_reason_V202123 == 16  ~ 3,
     difficulty_how_difficult_V202119 >= 2 ~ 2,
     TRUE ~ 1
+  ),
+  # Here we record the level of difficulty self-reported by voters
+  # NOTE: This excludes non-voters, who were not asked this question
+  diff_ranked = case_when(
+    difficulty_how_difficult_V202119 > 0 ~ as.numeric(difficulty_how_difficult_V202119)
   )
 )
 
 
 ## Create the Obstacles Index ##
-data <- data %>% mutate(
-  diff_index = select(., diff_registration, 
-                      diff_idcard, 
-                      diff_absentee,
-                      diff_confusionball, 
-                      diff_accesspoll, 
-                      diff_wait, 
-                      diff_worksched, 
-                      diff_weather, 
-                      diff_ballmail, 
-                      diff_sick, 
-                      diff_notallowed, 
-                      diff_where,
-                      diff_other) %>% 
-    rowSums(na.rm = TRUE))
+#data <- data %>% mutate(
+#  diff_index = select(., diff_registration, 
+#                      diff_idcard, 
+#                      diff_absentee,
+#                      diff_confusionball, 
+#                      diff_accesspoll, 
+#                      diff_wait, 
+#                      diff_worksched, 
+#                      diff_weather, 
+#                      diff_ballmail, 
+#                      diff_sick, 
+#                      diff_notallowed, 
+#                      diff_where,
+#                      diff_other) %>% 
+#    rowSums(na.rm = TRUE))
 
 ## Quick analysis of different difficulty situations, index, and subjective difficulty 
 
@@ -269,9 +284,8 @@ data_analysis <- data %>% select(diff_registration,
                                  diff_notallowed, 
                                  diff_where,
                                  diff_other, 
-                                 diff_index, 
-                                 diff_subj, 
-                                 diff_subj2)
+                                 diff_categorical,
+                                 diff_ranked)
 
 # Create a function that creates a data frame with the counts and % of each option 
 analysis_df <- function(x) {
@@ -290,9 +304,8 @@ analysis_all_df
 data_fin <- data %>% select(id_V200001,
                             voter_post_vote_status_V202068x,
                             party,
-                            diff_index,
-                            diff_subj, 
-                            diff_subj2)
+                            diff_categorical,
+                            diff_ranked)
 # Do we want voted or not to be binary? I think it would make more sense
 # mutate(voter = case_when(voter_post_vote_status_V202068x == 2 ~ 1, TRUE ~ 0))
 ################################################################################
