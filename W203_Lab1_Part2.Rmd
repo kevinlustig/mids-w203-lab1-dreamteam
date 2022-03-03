@@ -16,7 +16,7 @@ header-includes:
 \setcounter{page}{1}
 
 ```{r , include=FALSE}
-knitr::opts_chunk$set(fig.width=3, fig.height=2)
+knitr::opts_chunk$set(fig.width=3.5, fig.height=2)
 ```
 
 ```{r setup and load packages, include=FALSE}
@@ -49,7 +49,7 @@ data_fin_difficulty = data_fin_reduced %>% filter(diff_categorical > 1)
 
 ```
 
-# Importance and Context [This needs to be cut down; claims about a certain party claiming vting is harder for their voters needs to be backed up by]
+# Importance and Context
 
 The topic of obstacles to voting has been the focus of considerable discussion in the United States in recent years, including notably before, during, and since the 2020 federal election. The debate over the facility with which Americans are able to vote has elicited claims both that voting in practice is too restrictive and challenging to allow for participation by all would-be voters and contrarily that it is so open and unrestricted that fraudulent voting can and does occur with limited recourse. Perhaps unsurprisingly, these assertions have largely arisen along partisan lines, and have been used as evidence in support of (often contradictory) changes to voting laws by elected officials and their supporters in both major political parties. Those affiliated with the Democratic Party are more likely to feel that it is too difficult to vote and support efforts to increase access to the polls, while Republican Party supporters are more likely to support restrictions on voting access. Naturally, the partisan nature of this debate means that voting behavior itself has been impacted, for example with Democratic voters significantly more likely to vote early and by mail than Republican voters in 2020, both methods widely discussed as fraught with error and likely to be fraudulent by prominent members of the Republican party. 
 
@@ -91,11 +91,11 @@ To generate an index for **people who did not vote,** the research team followed
 # diff_ranked distribution for Democrats
 gghistogram(sub_dem$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Level of Difficulty: Democrats')
 ```
+
 ```{r echo=FALSE,warning=FALSE}
 # diff_ranked distribution for Republicans
 gghistogram(sub_rep$diff_ranked, bins = 5, fill= 'steelblue', xlab='', main = 'Level of Difficulty: Republicans')
 ```
-
 
 2. **Ordinal Difficulty Variable:**
 
@@ -110,11 +110,11 @@ This variable has three categories:
 
 ```{r echo=FALSE,warning=FALSE}
 # diff_categorical distribution for Democrats
-gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Difficulty and Voting Status: Democrats')
+gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Difficulty & Voting Status (Dem.)')
 ```
 ```{r echo=FALSE,warning=FALSE}
 # diff_categorical distribution for Republicans
-gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Difficulty and Voting Status: Republicans')
+gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Difficulty & Voting Status (Rep.)')
 ```
 
 
@@ -147,6 +147,7 @@ It is important to note some key limitations of this approach. Factors that are 
 Our analysis finds, first, that the reported incidence of voting difficulty is quite low for all voters. Our analysis using the ranked level of self-reported difficulty showed no significant difference between Republican and Democrat voters; this is primarily due to the fact that neither party group as a whole experienced much difficulty voting. However, in examining the subset of voters who did self-report difficulty, we propose that it is meaningful to know how many were not able to ultimately cast a ballot due to that difficulty. With regard to this measurement, we do find that Democrats who experienced difficulty at the polls were slightly but significantly more likely to not complete the act of voting than Republicans. 
 
 This study suggests a number of interesting questions that merit further research. Are there significant differences in the kind or amount of difficulty faced by just those voters who did experience difficulty? Do Democrat and Republican voters report or experience different kinds of difficulty at different rates? Does the incidence of difficulty voting change from election to election? We believe our results are most interesting in the context of these and other answers in helping to form an evidence base for ongoing debates about voting access. The right mix of policy solutions for changing (or preserving) current voting practices depends on an understanding of the real ease or difficulty of voting, and particularly whether some groups find voting to be more or less accessible to them than other groups do. We hope that our findings can help to point the way toward additional answers that will contribute to effective and evidence-based policy-making that ensures fair access to the polls for all voters with a minimum of obstacles. 
+\newpage
 
 # Appendix 1: Data Tables
 
