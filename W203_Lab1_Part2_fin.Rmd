@@ -20,7 +20,7 @@ knitr::opts_chunk$set(fig.width=6, fig.height=2.5)
 ```
 
 ```{r setup and load packages, include=FALSE}
-
+# Load in Necessary Packages 
 options(tinytex.verbose = TRUE)
 knitr::opts_chunk$set(echo=FALSE, message=FALSE)
 
@@ -29,21 +29,171 @@ library(magrittr)
 library(knitr)
 library(ggpubr)
 library(ggplot2)
-```
-
-```{r load data, include=FALSE}
-source("data_wrangling.r")
+library(dplyr)
+library(readr)
+library(scales)
 ```
 
 ```{r echo=FALSE}
+## Prep Work ##
+
+# Set working Directory 
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+# Load in dataset 
+raw <- read.csv('datasets/anes_timeseries_2020_csv_20220210.csv')
+
+# Select relevant columns and format dataset 
+# Format dataset
+columns = c(
+  #General info
+  "V200001"="id_V200001",
+  #Voter status
+  "V202068x"="voter_post_vote_status_V202068x",
+  "V202109x"="voter_turnout_V202109x",
+  #Voting difficulty
+  "V201024"="difficulty_manner_voted_V201024",
+  "V202116"="difficulty_when_voted_V202116",
+  "V202117"="difficulty_how_voted_V202117",
+  "V202118"="difficulty_how_usually_votes_V202118",
+  "V202119"="difficulty_how_difficult_V202119",
+  "V202120a"="difficulty_encountered_registration_V202120a",
+  "V202120b"="difficulty_encountered_id_V202120b",
+  "V202120c"="difficulty_encountered_absentee_V202120c",
+  "V202120d"="difficulty_encountered_ballot_V202120d",
+  "V202120e"="difficulty_encountered_polling_place_V202120e",
+  "V202120f"="difficulty_encountered_wait_V202120f",
+  "V202120g"="difficulty_encountered_work_V202120g",
+  "V202120h"="difficulty_encountered_weather_V202120h",
+  "V202120i"="difficulty_encountered_mailing_V202120i",
+  "V202120j"="difficulty_encountered_other_V202120j",
+  "V202120k"="difficulty_encountered_none_V202120k",
+  "V202121"="difficulty_wait_time_V202121",
+  "V202122"="difficulty_time_to_polling_place_V202122",
+  "V202123"="difficulty_didnt_vote_reason_V202123",
+  #Party affiliation
+  "V201231x"="party_pre_id_V201231x",
+  "V202065x"="party_prepost_registration_V202065x",
+  "V202064"="party_post_registration_V202064"
+)
+
+data <- raw %>% select(names(columns))
+data <- data %>% rename_with(~ columns[.])
+```
+
+```{r, echo=FALSE, include=FALSE}
+## Filter Dataset by Voter Status and Party Affiliation ## 
+
+### Voter Status ###
+#Eliminate anyone who does not have any voter status info or who is not registered and did not vote
+data <- data %>% filter(data$voter_post_vote_status_V202068x > 0)
+# Note that the above drops the 1,227 people who we don't consider voters.
+
+# Check how many people registered but did not vote 
+sum(data$voter_post_vote_status_V202068x==1)
+# ~650 people registered but did not vote. We will keep this group and consider them "voters" (intended to vote)
+#Not necessary to filter on voter turnout summary, as it is already a summary that includes V202068x
+#data <- data %>% filter(data$voter_turnout_V202109x >= 0)
+
+### Party Affiliation ###
+#Eliminate anyone without a summary party ID value
+#NOTE: Only reduces the dataset by < 20 rows - likely most voters that provided vote info also provided party info
+data <- data %>% filter(data$party_pre_id_V201231x > 0)
+
+#Not going to filter on registration because if we have party ID summary, this is enough to decide affiliation
+#However, if lots of voters have conflicting ID and registration, we might want to revisit this
+#NOTE: This significantly reduces the size of the dataset - most respondents don't have values for both of these questions
+#data <- data %>% filter(data$party_prepost_registration_V202065x > 0)
+#data <- data %>% filter(data$party_post_registration_V202064 > 0)
+
+## Cleanup
+
+### Looking for columns with all NAs, none found
+#not_all_na <- function(x) any(!is.na(x))
+#dv <- dv %>% select(where(not_all_na))
+
+### Auto type detection/conversion
+# No need for this, as all selected columns are already Z
+#data <- readr::type_convert(data)
+
+### Determine Party Affiliation 
+
+# Explore: how many are independent with no lean?
+sum(data$party_pre_id_V201231x==4) #719 - a meaningful number
+# We can't consider these members of either D or R party
+# We are choosing NOT to use how they have voted in the past or in this election to tag them as a party
+# Therefore we will leave them as "independent" for now (so we have three possible party tags - D, R, and I)
+# If partyID is 1,2, or 3 (strong dem, not very strong dem, indep-dem), tag with D
+# If partyID is 4 (indep) tag with I 
+# If partyID is 5,6, or 7 (strong rep, not very strong rep, indep-rep), tag with R
+
+data <- data %>%
+  mutate(party = case_when(party_pre_id_V201231x <=3 ~ "D",
+                           party_pre_id_V201231x ==4 ~ "I",
+                           party_pre_id_V201231x >=5 ~ "R"))
+
+#table(data$party) # This tells us how many of each we have 
+data <- data %>% filter(data$party != "I")
+```
+
+```{r echo=FALSE, include=FALSE}
+## Get the Difficulty Variables ##
+## Add in columns combining difficulty scenarios for people who did and did not vote ##
+data <- data %>% mutate(
+  diff_categorical = case_when(# Here we record the level of difficulty self-reported by voters; excludes non-voters who weren't asked this question 
+    difficulty_didnt_vote_reason_V202123 == 6 | 
+    difficulty_didnt_vote_reason_V202123 == 8 |
+    difficulty_didnt_vote_reason_V202123 == 9 |
+    difficulty_didnt_vote_reason_V202123 == 10 |
+    difficulty_didnt_vote_reason_V202123 == 11 |
+    difficulty_didnt_vote_reason_V202123 == 12 |
+    difficulty_didnt_vote_reason_V202123 == 13 |
+    difficulty_didnt_vote_reason_V202123 == 14 |
+    difficulty_didnt_vote_reason_V202123 == 16  ~ 3,
+    difficulty_how_difficult_V202119 >= 2 ~ 2,
+    TRUE ~ 1
+  ), 
+  diff_ranked = case_when(
+    difficulty_how_difficult_V202119 > 0 ~ as.numeric(difficulty_how_difficult_V202119)
+  )
+)
+
+
+## Quick analysis of the two difficulty variables ##
+### Done more for internal discussion purposes 
+# # Select relevant columns 
+# data_analysis <- data %>% select(diff_categorical,
+#                                  diff_ranked)
+# 
+# # Create a function that creates a data frame with the counts and % of each option 
+# analysis_df <- function(x) {
+#   as.data.frame(table(x, useNA = "ifany")) %>%
+#     mutate(Perc = scales::percent(Freq/sum(Freq)), accuracy = 1L) %>%
+#     select(-accuracy)
+# }
+# 
+# # Apply the function on all the columns in the data frame
+# analysis_all_df <- apply(data_analysis,2, analysis_df)
+# analysis_all_df
+```
+
+```{r , echo=FALSE}
+## Select relevant variables that will be used for statistical testing ##
+data_fin <- data %>% select(id_V200001,
+                            voter_post_vote_status_V202068x,
+                            party,
+                            diff_categorical,
+                            diff_ranked)
 data_fin_reduced <- data_fin %>% select(party, diff_ranked, diff_categorical)
 data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
+```
 
-# splitting the dataset in two 
+```{r echo=FALSE}
+# Split the dataset into the two samples 
 sub_dem <- data_fin_reduced[data_fin_reduced$'party' == 'D', ]
 sub_rep <- data_fin_reduced[data_fin_reduced$'party' == 'R', ]
 
-# focus on only voters who self-reported difficulty either after casting a vote or being unable to
+#Focus on only voters who self-reported difficulty either after casting a vote or being unable to
 
 data_fin_difficulty = data_fin_reduced %>% filter(diff_categorical > 1)
 
@@ -51,9 +201,7 @@ data_fin_difficulty = data_fin_reduced %>% filter(diff_categorical > 1)
 
 # Importance and Context
 
-The topic of obstacles to voting has been the focus of considerable discussion in the United States in recent years, including notably before, during, and since the 2020 federal election. The debate over the facility with which Americans are able to vote has, unsurprisingly, been divided along partisan lines. Democrats are more likely to feel that voting is too restrictive to allow for participation by all would-be voters, while Republicans generally assert that voting is so open and unrestricted that fraudulent voting can and does occur. Elected officials and their supporters in both major parties use claims about difficulty to guide voting laws; Democrats tend to support efforts to increase access to the polls while Republicans tend to support restrictions on voting access.
-
-This raises the question of whether the actual experience of difficulty voting is related to party affiliation. Perhaps attitudes toward measures to loosen or tighten voting regulations are driven by real or perceived differences in personal experience with voting difficulty. This analysis therefore seeks to address the following research question: 
+The topic of voting obstacles has been highly debated in the United States, especially during 2020 pesidential election. The debate over the facility with which Americans are able to vote has, unsurprisingly, been divided along partisan lines. **Democrats are more likely to feel that voting is too restrictive to allow for participation by all would-be voters, while Republicans generally assert that voting is so open and unrestricted that fraudulent voting can and does occur. Elected officials and their supporters in both major parties use claims about difficulty to guide voting laws; Democrats tend to support efforts to increase access to the polls while Republicans tend to support restrictions on voting access.** **--> THIS NEEDS TO BE SUPPORTED BY SOURCES OR TAKEOUT AND MAKE MORE GENERAL** This raises the question of whether the actual experience of difficulty voting is related to party affiliation. Perhaps attitudes toward measures to loosen or tighten voting regulations are driven by real or perceived differences in personal experience with voting difficulty. This analysis therefore seeks to address the following research question: 
 
 *Did Democrats or Republicans have more difficulty voting in the 2020 election?*
 
@@ -63,15 +211,11 @@ This question has the potential to illuminate important aspects of the debate ab
 
 This study uses data from the 2020 American National Election Studies (ANES), specifically their 2020 Time Series Study, which includes survey responses for a random sample of US Citizens from both before and after the 2020 election. The full dataset includes 8,280 observations. Our study focuses only on "voters" who are categorized as either Democrats or Republicans. We operationalize the concept of a "voter" and define party affiliation as follows:
 
-We consider a *"voter"* to be anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately did not vote - perhaps because of some difficulty. In order to determine who is a "registered" voter, we use a post-vote status variable because it is possible some people registered after the pre-election survey but before the election. Eliminating anyone for whom we did not have voter status info as well as those who were not registered by the time of the post-election survey drops 1,227 individuals from our sample, leaving 7,053 "voters." 
+We consider a *"voter"* to be anyone in the ANES survey sample who registered to vote - regardless of whether or not they voted in the 2020 election. Since this study examines **difficulty** voting, it is important to consider the subset of people who implied some intention to vote (by registering) but ultimately may not have been able to vote. To determine who is a "registered" voter, we use a post-vote status variable^[Variable number:V202068x] because it is possible some people registered after the pre-election survey but before the election. Eliminating respondents who did not fit our voter definition dropped 1,227 individuals from our sample, leaving 7,053 "voters." 
 
-In order to determine *party affiliation,* we use a self-reported party identification variable. Since this study focuses specifically on Democrats and Republicans (and does not break down results by the strength of one's affiliation to their party), we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. Another possible way to define somebody's party is based on who they voted for: but in the 2020 election especially, many people did not vote for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. After dropping the 719 individuals who self-identified as Independent and the 18 people who did not provide a party affiliation, we are left with a total of 6316 observations.
+To determine *party affiliation,* we use a self-reported party identification variable.6[Variable number:V201231x] Since this study focuses specifically on Democrats and Republicans in general, we classify anyone who reported leaning Democrat as a Democrat and anyone who reported leaning Republican as a Republican. Another possible way to define somebody's party is based on who they voted for, but it is possible that voters may not have voted for their party's candidate. Therefore, we define party affiliation solely based on the self-reported variable. The 719 individuals self-identified as Independent and 18 did not provide a party affiliation were dropped, leaving 6316 observations.
 
-We next operationalize the concept of *"difficulty in voting."* Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. The ANES survvey provides different information for both these groups.
-
-For **respondents who voted,** the ANES survey specifically asks whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty (up to nine), if they encountered multiple. For the respondents who voted, the survey also asked directly how much difficulty they encountered, if any (e.g. none, little, moderate, extreme). For **people who did not vote,** the ANES survey asked for the two main reason they did not vote, meaning that respondents could choose only two potential forms of difficulty^[Variable numbers: V202123 and V202124], compared to the nine for voters who did end up voting. 
-
-Given this context it was decided to look at two variables that could represent difficulty: difficulty ranking and difficulty category. 
+We next operationalize the concept of *"difficulty in voting."* Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. First we looked at the existing information from the ANES survey provides. For **respondents who voted,** the ANES survey specifically asks whether they had encountered specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc). Participants could indicate more than one type of difficulty (up to nine), if they encountered multiple. For the respondents who voted, the survey also asked directly how much difficulty they encountered, if any (e.g. none, little, moderate, extreme). For **people who did not vote,** the ANES survey asked for the two main reason they did not vote, meaning that respondents could choose only two potential forms of difficulty^[Variable numbers: V202123 and V202124], compared to the nine for voters who did end up voting. Given this context it was decided to look at two variables that could represent difficulty: difficulty ranking and difficulty category. 
 
 *Difficulty ranking* \newline
 Only respondents who did vote in the 2020 election were posed the question "How difficulty was it to vote?" with the folowing possible responses (and given value in the ANES survey): not difficult at all (1), a little difficult (2), moderately difficult (3), very difficult (4), extremely difficult (5).^[In the codebook this is variable number V202119; responses such as "no post election data" or "no post election interview would have been filtered out beforehand]  
@@ -81,7 +225,7 @@ As the difficulty ranking variable accounts only for respondents classified ass 
 
 Category 2 consists of voters (those who voted) who responded *a little difficult* until *extremely difficult* in the difficulty ranking variable. For those who voted and selected *not difficult at all*, they were categorized into group 1.
 
-In the ANES survey, respondents who did not end up voting were asked to identify the main reason why.^[Variable number: V202123] For the respondents who were asked this question the possible responses included a mix of reasons as to why a voter was not interested in voting and a difficulty that kept the voter from voting.^[In the codebook this is variable number V202119; responses such as "no post election data" or "no post election interview would have been filtered out beforehand] For this category, only the following responses that indicated a difficulty preventing the person from voting (and given value in the ANES survey: (6) "I did not have the correct form of identification", (8) "sick or disabled", (9) "transportation", (10) "bad weather", (11) "the line at the polls was too long", (12) "I was not allowed to vote at the polls, even though I tried", (13) "I requested buut did not receive an absentee ballot", (14) "I did not know where to vote", (16) "Other". These mentioned responses were allocated into category 3 as they experienced difficulties that played a role in preventing them from voting (compared to thoe who chose not to vote because they forgot or weren't interested.^[A follow up question was asked to those who did not vote to provide a second reason as to why they did not vote. Given that this category aims to weed out those who experienced legitimate difficulty in trying to vote, it was sufficient to pulll from the main question asked. In the cases where a respondent would answer the follow up question to give an additional reason as to why they did not vote, if they selected an eligible category 3 response the first time, then that respondent would already have been included in category 3. If the first time they selected an ineligble category 3 response, and then selected an eligible category 3 response, in the end they would count as someone who in the end did have enough interest to put in enough effort to vote. The ineligible category 3 responses include those such as "did not like candidates" or "I forgot", etc.]. Those who chose an ineligible category 3 response, would be moved to category 1 - a voter who did not experience difficulty voting. 
+In the ANES survey, respondents who did not end up voting were asked to identify the main reason why.^[Variable number: V202123] For the respondents who were asked this question the possible responses included a mix of reasons as to why a voter was not interested in voting and a difficulty that kept the voter from voting.^[In the codebook this is variable number V202119; responses such as "no post election data" or "no post election interview would have been filtered out beforehand] For this category, only the following responses that indicated a difficulty preventing the person from voting (and given value in the ANES survey: (6) "I did not have the correct form of identification", (8) "sick or disabled", (9) "transportation", (10) "bad weather", (11) "the line at the polls was too long", (12) "I was not allowed to vote at the polls, even though I tried", (13) "I requested buut did not receive an absentee ballot", (14) "I did not know where to vote", (16) "Other". These mentioned responses were allocated into category 3 as they experienced difficulties that played a role in preventing them from voting (compared to thoe who chose not to vote because they forgot or weren't interested.^[Respondents who didn't vote could also give a second reason. Given that this category aims to weed out those who experienced legitimate difficulty in trying to vote, it was sufficient to pull from the main question asked because this questtion was not asked to all respondents who did not vote, and the main reason is what was deemed to be most relevant for this study]. Those who chose an ineligible category 3 response, would be moved to category 1 - a voter who did not experience difficulty voting. 
 
 **Proposed Testing**
 We propose to conduct two hypothesis tests - one for each difficulty variable. For the data ranking variable we propose a two sample t-test, and for the difficulty category variable we propose a Wilcoxon Rank Sum Test. Both the difficulty variables are independent and identically distributed due to the data collection and transformation protocols that were followed by those conducting the ANES survey - satisfying one of the three conditions for both tests. Given that the difficulty rankings seem to have an understood equal distance between each value (no unexpected neutral jumps), this variable could qualify as a metric variable, satisfying another condition for a two sampled t-test. The difficulty category variable satisfies the possibility of having an ordinal variable for a Wilcoxon rank sum test. Regarding the normality condition for conducting a t-test, while the histograms for the difficulty ranking variable for both parties do not seem to show a normal distribution (Appendix: Figures 1 and 2), due to the large sample size (n = 6316), it is likely the central limit theorem (CLT) can be applied here. The CLT states that the distribution of the sample means converge to a normal distribution as the sample size gets larger. Given the context, it is likely this can be applied here and satisfy the normality condition - and the final condition needed to conduct a t-test. The final condition to conduct a Wilcoxon rank sum test is that the distribution and spread of the two samples (Democratic and Republican) be similar. Figures 3 and 4 (Appendix) clearly show a similar shape and distribution. 
@@ -182,10 +326,4 @@ gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main
 ```{r echo=FALSE,warning=FALSE}
 # diff_categorical distribution for Republicans
 gghistogram(sub_dem$diff_categorical, bins = 3, fill= 'steelblue', xlab='', main = 'Figure 4: Difficulty Categories, Republican')
-```
-\newline
-
-# Appendix 2: R Code
-
-```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
 ```
