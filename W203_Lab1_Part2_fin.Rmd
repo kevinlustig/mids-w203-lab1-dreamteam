@@ -184,17 +184,18 @@ data_fin <- data %>% select(id_V200001,
                             party,
                             diff_categorical,
                             diff_ranked)
+## Reduce to key variables
 data_fin_reduced <- data_fin %>% select(party, diff_ranked, diff_categorical)
+## Reduce to only D and R voters
 data_fin_reduced <- data_fin_reduced %>% filter(data_fin_reduced$party == 'D' | data_fin_reduced$party == 'R')
 ```
 
 ```{r echo=FALSE}
-# Split the dataset into the two samples 
+# Split the dataset into the two samples for analysis
 sub_dem <- data_fin_reduced[data_fin_reduced$'party' == 'D', ]
 sub_rep <- data_fin_reduced[data_fin_reduced$'party' == 'R', ]
 
 #Focus on only voters who self-reported difficulty either after casting a vote or being unable to
-
 data_fin_difficulty = data_fin_reduced %>% filter(diff_categorical > 1)
 
 ```
@@ -218,7 +219,7 @@ We consider a *"voter"* to be anyone in the ANES survey sample who registered to
 We next operationalize the concept of *"difficulty in voting."* Given the subjective nature of the term "difficulty", there are various ways difficulty in voting could be conceptualized. The first important distinction we need to make among registered voters is whether or not they actually voted in the 2020 election. The ANES survey provides different information for those who cast a ballot and those who did not. For **respondents who voted,** the ANES survey asks them both to enumerate specific difficulties in trying to vote (e.g. long lines, failing to provide proper registration papers, etc) and the degree of difficulty they encountered, if any. For **people who did not vote,** the ANES survey asks for the two main reasons they did not vote.^[Variable numbers: V202123 and V202124] This inequality in the data for the two types of voters poses a challenge for analyzing the degree of difficulty faced, which we expand on in describing two variables that we elect to use to represent difficulty: difficulty ranking and difficulty category. 
 
 *Difficulty ranking* \newline
-Only respondents who did vote in the 2020 election were posed the question "How difficult was it to vote?" with the following possible responses: not difficult at all (1), a little difficult (2), moderately difficult (3), very difficult (4), extremely difficult (5).^[Survey question V202119; responses such as "no post election data" or "no post election interview" have been filtered out]  
+Only respondents who did vote in the 2020 election were posed the question "How difficult was it to vote?" with the following possible responses: not difficult at all (1), a little difficult (2), moderately difficult (3), very difficult (4), extremely difficult (5).^[Survey question V202119; responses such as "no post election data" or "no post election interview" have been filtered out] We employ these values as a simple variable indicator of degree of difficulty voting.
 
 *Difficulty Category* \newline
 While the difficulty ranking variable appears to be a straightforward way to answer the research question premised on the idea of more or less difficulty voting, it's important to reiterate that it accounts only for respondents who were able to complete the act of voting. It does not provide insight on difficulty faced by voters (as per the definition mentioned above) who tried to vote, but encountered so much difficulty that in the end they were not able to vote. Because the ultimate concern about difficulty voting that motivates this research is that it may ultimately prevent eligible voters from casting a ballot, we propose that voters that are unable to vote due to difficulty are the *most severely* impacted by voting restrictions, and thus merit special focus in our analysis. Thus, we create a synthetic variable encompassing three categories: (1) voters who did not experience difficulty when trying to vote (regardless of whether they ended up voting or not), (2) voters who self-reported any degree of difficulty in the difficulty ranking variable and still managed to vote, and (3) voters who experienced difficulty and were not able to vote.
