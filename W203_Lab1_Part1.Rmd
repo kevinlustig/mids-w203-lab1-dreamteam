@@ -79,7 +79,6 @@ The "Life Ladder" score (LLS) variable is composed of continuous values. Data ca
 The "Life Ladder" seems to correspond to a metric variable which satisfies the first assumption. The "Log GDP per capita" is used to divide the studied population into two groups and is not directly used by the test.
 
 Assuming that data collection and transformation protocols were followed in similar fashion throughout the data collection and transformation activities, it can be assumed that the random variables are independent and identically distributed. 
-
 ```{r, include=FALSE}
 # Load in dataset 
 wh_data <- read.csv('datasets/happiness_WHR.csv')
@@ -123,37 +122,13 @@ gghistogram(high_gdp_cap, main = 'LLS: High GDP per Capita Countries', x = 'Life
 #hist($) #fix #make pretty 
 gghistogram(low_gdp_cap, main = 'LLS: Low GDP per Capita Countries', x = 'Life.Ladder', fill= 'steelblue', bins = 10,  xlab = 'Life Ladder Scores', ylab = 'Count')
 ```
-The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. 
+The distribution for high GDP per capita countries is left skewed and contains two peaks. The overall shape does not seem to represent a normal distribution. The second distribution for low GDP per capita countries contains a single peak closer to the middle of the distribution and shows a symmetric behavior, indicating perhaps that there may be some normality. Considering the samples size, another approach can be taken:
 
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
-#Density plots are used below to better assess the correlation between the samples and the normal distribution. Black dots closely positioned to the 45 degrees reference line would suggest a data distribution close to the normal distribution.
-# Observe the density plots of both variables versus the normal distribution 
-ggqqplot(high_gdp_cap$Life.Ladder, title = "LLS High GDP per Capita Countries vs Normal Dist." )
-```
-
-```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center', include=FALSE}
-# Observe the density plots of both variables versus the normal distribution
-ggqqplot(low_gdp_cap$Life.Ladder, title = "LLS Low GDP per Capita Countries vs Normal Dist.")
-#The black dots fluctuate around the reference line without forming a straight line. The visual study of this distribution does not provide a clear yes/no answer. 
-```
-But since a visual investigation does not seem to be the most convincing of the LLS' normality, a Shapiro-Wilk normality test will be performed to quantitatively assess the distribution of the LLS for both high and low GDP per capita countries. The Shapiro Wilk normality test compares the sample distribution to a normal distribution to determine whether or not the data shows serious deviation from normality. The null hypothesis of this test is that our “sample distribution is normal”. If the test is significant, the distribution is not normal.^[Source: "Statistical Tests and assumptions",  https://www.datanovia.com/en/lessons/normality-test-in-r/#check-normality-in-r.]
-
-```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normality
-shapiro.test(low_gdp_cap$Life.Ladder)
-```
-The Shapiro Wilk test for the LLS distribution for low GDP per capita countries (above) has a p-value of 0.05055, indicating it barely made the cut for us to accept the null that there is no significant difference between the sample and a normal distribution - i.e. the sample is normal (barely). 
-
-```{r, echo=FALSE, comment=""}
-# Can do a Shapiro test as an extra source of evidence to test for normality
-shapiro.test(high_gdp_cap$Life.Ladder)
-```
-The Shapiro Wilk test for the LLS distribution for high GDP per capita countries has a p-value of 0.01434, indicating that the null should be rejected and that the sample is not normal. 
-
-Given that the results from the Shapiro Wilk test barely indicated normality for the life ladder scores for low GDP per capita countries and did NOT indicate normality for the life ladder scores for high GDP per capita countries, the third assumption of normality is not validated.\newline
+The Central Limit Theorem (CLT) states that the distribution of a standardize sample mean converge to a normal curve distribution as the sample size tends to infinity. The CLT requires that data are IID and the population has finite variance. The first statement has already been verified. The finite variance one can be visually assessed via the samples distributions. 
+As the Samples distributions are not heavy tailed distributions, we can assume (with caution) that each population has a positive variance. In that context, the CLT seems applicable.
 
 **Conduct the test?**\newline
-Considering that the normality assumption is not met, the Two Sample t-Test would not be best suited for this context.
+Given that the assumptions are satisfied including the normality assumption, the t-test is applicable.
 
 ### Legislators 
 
@@ -276,14 +251,14 @@ The Wilcoxon Signed Rank Test can be applied in that context, with some caution.
 
 ### Attitudes Toward the Religion 
 
-*Scenario:* We would like to know whether the U.S. population feels more positive towards Protestants or Catholics. 
+*Scenario:* Investigate whether the U.S. population feels more positive towards Protestants or Catholics. 
 
 *Proposed Test:* Paired t-Test
 
 *Test Assumptions:* \newline
 1. Metric Variables\newline
 2. i.i.d.\newline
-3. Paired\newline
+3. Paired data\newline
 4. Normality\newline
 
 The feeling thermometer variables towards both Protestants and Catholics is continuous and metric in nature since the respondents can choose their rating on a continuous scale from 0 to 100. Thus the first condition is satisfied 
@@ -315,30 +290,12 @@ gghistogram(rel_data$prottemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Ther
 
 ```{r, echo=FALSE, comment="", fig.width=4, fig.height=2, fig.align='center'}
 diff_prottemp_cathtemp <- as.numeric(rel_data$prottemp - rel_data$cathtemp)
-gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 7, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
+gghistogram(diff_prottemp_cathtemp, fill= 'steelblue', bins = 9, xlab = 'Feeling Thermometer Rating', ylab = 'Count', main = 'Distribution of Feelings Difference')
 ```
 
-Looking at the above to histograms it does not look like the distributions are normal. The differences histogram looks symmetrical but not necessarily normal. The Shapiro-Wilk test  conducted below will confirm these observations. 
-
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(rel_data$cathtemp)
-```
-The results of the Shapiro-Wilk test on the feelings thermometer towards Catholics, has a p-value that is close to 0, indicating this variable does not have a normal distribution.  
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(rel_data$prottemp)
-```
-The results of the Shapiro-Wilk test on the feelings thermometer towards Protestants, has a p-value that is close to 0, indicating this variable does not have a normal distribution. 
-
-```{r, echo=FALSE, comment=""}
-# Conduct a Shapiro test to also help determine normality 
-shapiro.test(diff_prottemp_cathtemp)
-```
-For the difference, the results also show here a p-value less than 0.05, indicating that the difference distribution is not normal. 
-
-Based on the results of the visual investigation and Shapiro-Wilk tests, the third condition of normality is not met. 
+The differences histogram looks symmetrical, not necessarily normal but not heavy-tailed. Considering the large sample size (superior than 800 observations) and the non heavy-tailed behavior (with caution) of the difference distribution, the Central Limit Theorem (CLT) seems applicable. The CLT states that a standardize sample mean distribution converges to a normal curve as n (the sample size) tends to infinity. In this context, the application of the CLT suggests that the normality assumption is satisfied.
 
 **Conduct the test?** 
 \newline
-The distribution of the differences between US population feelings toward Catholics and Protestants is not normally distributed (considering both graph and Shapiro test values). The normality distribution of differences is one of the key criteria to apply a Paired t-test. Even though the other criteria regarding metric variables, independent and identical distributions, and paired data are met, the normality assumption is not verified. Hence the paired t-test can not be applied in this context.
+
+The four criteria are met.Hence the paired t-test can be applied.
